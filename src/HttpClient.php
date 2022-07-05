@@ -1,6 +1,7 @@
 <?php
 
 namespace Cozy\Lib\Guesty;
+
 use Exceptions\IO\Network\UnexpectedResponseException;
 
 
@@ -54,8 +55,13 @@ class HttpClient
      */
     public function post($url, $headerArray, $data)
     {
+        print_r($data);
         if ($this->baseUrl) {
             $url = trim($this->baseUrl . '/', '/') . "/" . ltrim($url, '/');
+        }
+
+        if (is_array($data)) {
+            $data = http_build_query($data);
         }
 
         $ch = curl_init();
@@ -75,7 +81,7 @@ class HttpClient
 
         curl_close($ch);
 
-        if (strcasecmp($server_output, 'ok')==0) {
+        if (strcasecmp($server_output, 'ok') == 0) {
             return true;
         }
 
@@ -95,6 +101,10 @@ class HttpClient
             $url = trim($this->baseUrl . '/', '/') . "/" . ltrim($url, '/');
         }
 
+        if (is_array($data)) {
+            $data = http_build_query($data);
+        }
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -111,7 +121,7 @@ class HttpClient
 
         curl_close($ch);
 
-        if (strcasecmp($server_output, 'ok')==0) {
+        if (strcasecmp($server_output, 'ok') == 0) {
             return true;
         }
 
@@ -145,7 +155,7 @@ class HttpClient
 
         curl_close($ch);
 
-        if (strcasecmp($server_output, 'ok')==0) {
+        if (strcasecmp($server_output, 'ok') == 0) {
             return true;
         }
 

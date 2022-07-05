@@ -9,8 +9,11 @@ class GuestyClientTest extends TestCase
 {
     public function testCreation()
     {
-        $guestyClient = new GuestyClient();
-        $count = $guestyClient->getListingCount();
-        $this->assertNotEquals($count, 0);
+        //GUESTY OPEN API KEY
+        $guesty_client_id="";
+        $guesty_client_secret="";
+        $guestyClient = new GuestyClient($guesty_client_id, $guesty_client_secret,);
+        $token = $guestyClient->fetchNewToken();
+        print_r( $token);
     }
 }
