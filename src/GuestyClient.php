@@ -3,7 +3,7 @@
 namespace Cozy\Lib\Guesty;
 
 
-class GuestyClient extends AbstractClient
+class GuestyClient extends AbstractClient implements IUpdatableTokenClient
 {
     public const BASE_URL = "https://api.guesty.com/api/v2/";
 
