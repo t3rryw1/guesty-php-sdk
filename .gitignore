@@ -37,7 +37,6 @@
 
 # PHPUnit
 /app/phpunit.xml
-/phpunit.xml
 
 # Build data
 /build/
@@ -50,3 +49,5 @@
 
 # Embedded web-server pid file
 /.web-server-pid
+
+*.cache

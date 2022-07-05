@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.0/phpunit.xsd"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="phpunit.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+>
+
+    <testsuites>
+        <testsuite name="Guesty SDK Test Suite">
+            <directory>test</directory>
+        </testsuite>
+    </testsuites>
+
+
+
+</phpunit>

@@ -11,9 +11,23 @@
     ],
     "require": {
         "monolog/monolog": "^2.7",
-        "crazycodr/standard-exceptions": "^2.4"
+        "crazycodr/standard-exceptions": "^2.4",
+        "php": ">=7.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"
-    }
+    },
+    "autoload": {
+        "psr-4": {
+          "Cozy\\Lib\\Guesty\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cozy\\LibTest\\Guesty\\": "test/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    }    
 }
