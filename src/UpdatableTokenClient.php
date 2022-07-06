@@ -9,9 +9,9 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     protected $token;
     protected $expiredAt;
 
-    function __construct($baseUrl,string $token=null,$expiredAt=null)
+    function __construct($client, string $token=null, string $expiredAt=null)
     {
-        $this->client =new ClientWrapper($baseUrl);
+        $this->client =$client;
         $this->token=$token;
         //TODO: handle expires logic 
         $this->expiredAt=$expiredAt;

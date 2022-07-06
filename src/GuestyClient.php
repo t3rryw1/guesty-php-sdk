@@ -26,14 +26,19 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const UPDATE_RESERVATION = ["PUT", "/v1/reservations/{reservationId}"];
 
     protected $token;
-    private $client_secret;
-    private $client_id;
+    private $clientSecret;
+    private $clientId;
 
-    public function __construct($client_id, $client_secret, $token = null, $expiresAt = null)
+    public function __construct(
+        $clientId,
+        $clientSecret,
+        $client,
+        $token = null, 
+        $expiresAt = null)
     {
-        parent::__construct(self::BASE_URL,$token,$expiresAt);
-        $this->client_id = $client_id;
-        $this->client_secret = $client_secret;
+        parent::__construct($client,$token,$expiresAt);
+        $this->clientId = $clientId;
+        $this->clientSecret = $clientSecret;
     }
 
     function fetchNewToken():array
@@ -44,8 +49,8 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         $authData = [
             'grant_type' => 'client_credentials',
             'scope' => 'open-api',
-            'client_secret' => $this->client_secret,
-            'client_id' => $this->client_id
+            'client_secret' => $this->clientSecret,
+            'client_id' => $this->clientId
         ];
         return $this->client->request(
             self::AUTH_TOKEN_URL,
