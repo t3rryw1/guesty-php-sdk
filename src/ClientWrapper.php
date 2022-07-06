@@ -11,25 +11,11 @@ class ClientWrapper
      */
     private $client;
     private $logger;
-    private $header;
 
-    public function __construct($baseUrl, $token, $logger = null)
+    public function __construct($baseUrl, $logger=null)
     {
         $this->client = new HttpClient($baseUrl);
-        $this->header = array(
-            "Authorization: Basic $token",
-            "Content-Type: application/json"
-        );
         $this->logger = $logger;
-    }
-
-    public function updateToken($token)
-    {
-        $this->header = array(
-            "Authorization: Basic $token",
-            "Content-Type: application/json"
-        );
-        return $this;
     }
 
     /**

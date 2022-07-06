@@ -2,48 +2,59 @@
 
 namespace Cozy\Lib\Guesty;
 
-
-abstract class UpdatableTokenClient extends ClientWrapper implements IUpdatableTokenClient
-{
+abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     /** @var callable */
     protected $tokenUpdateCallback;
-    private $client;
+    protected $client;
     protected $token;
+    protected $expiredAt;
 
-    function __construct($baseUrl, string $token = null)
+    function __construct($client, string $token=null, string $expiredAt=null)
     {
-        parent::__construct($baseUrl, $token);
-        $this->client = new ClientWrapper($baseUrl, $token);
-        $this->token = $token;
+        $this->client =$client;
+        $this->token=$token;
+        //TODO: handle expires logic 
+        $this->expiredAt=$expiredAt;
     }
 
-    function setTokenUpdateCallback(callable $callback)
-    {
+    function setTokenUpdateCallback(callable $callback){
         $this->tokenUpdateCallback = $callback;
+        return $this;
     }
 
-    private function refetchTokenAndRequest($method, $url, $params)
-    {
-        [$token, $expired] = $this->fetchNewToken();
-        if ($this->tokenUpdateCallback) {
-            call_user_func($this->tokenUpdateCallback, $token, $expired);
+    private function buildHeader(){
+        return array(
+            "Authorization: Basic {$this->token}",
+            "Content-Type: application/json"
+        );
+    }
+
+    private function refetchTokenAndRequest($urlArray, $params){
+        [$token,$expired]= $this->fetchNewToken();
+        if($this->tokenUpdateCallback){
+            call_user_func($this->tokenUpdateCallback,$token,$expired);
         }
         $this->token = $token;
-        return $this->client->request([$method, $url], $params);
+        return $this->client->request(
+            $urlArray,
+            $this->buildHeader(),
+            $params);
 
     }
 
-    function optimisticRequestWithToken($method, $url, $params)
-    {
-        if ($this->token) {
-            $response = $this->client->request([$method, $url], $params);
-            if ($this->isRequestTokenExpired($response)) {
-                return $this->refetchTokenAndRequest($method, $url, $params);
-            } else {
+    function optimisticRequestWithToken($urlArray, $params):mixed{
+        if($this->token){
+            $response = $this->client->request(
+                $urlArray,
+                $this->buildHeader(),
+                $params);
+            if($this->isRequestTokenExpired($response)){
+                return $this->refetchTokenAndRequest($urlArray, $params);
+            }else{
                 return $response;
             }
         }
-        return $this->refetchTokenAndRequest($method, $url, $params);
+        return $this->refetchTokenAndRequest($urlArray, $params);
     }
 
 
