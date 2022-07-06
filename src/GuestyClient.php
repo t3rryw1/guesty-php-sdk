@@ -52,13 +52,14 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             'client_secret' => $this->clientSecret,
             'client_id' => $this->clientId
         ];
-        return $this->client->request(
+        $res= $this->client->request(
             self::AUTH_TOKEN_URL,
             $authHeader,
             $authData,
             false
         );
-        //TODO: we need to parse result here and return token.
+        return [$res['access_token'],$res['expires_in']];
+        // we need to parse result here and return token.
     }
 
     function isRequestTokenExpired($response):bool

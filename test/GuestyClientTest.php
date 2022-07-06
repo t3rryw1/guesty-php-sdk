@@ -10,31 +10,61 @@ use PHPUnit\Framework\TestCase;
 
 class GuestyClientTest extends TestCase
 {
+
     public function testFetchNewToken()
     {
         /** @var ClientWrapper&MockObject $client*/
         $client = $this->createMock(ClientWrapper::class);
-        $client->method('request')
-            ->willReturn(["aaa"]);
+        $client->expects($this->once())
+            ->method('request')
+            ->with(
+                $this->equalTo(['POST','/oauth2/token']),
+                $this->equalTo(['accept: application/json']),
+                $this->equalTo([
+                    'grant_type' => 'client_credentials',
+                    'scope' => 'open-api',
+                    'client_secret' => 'test_client_secret',
+                    'client_id' => 'test_client_id'
+                ]),
+            )
+            ->willReturn([
+                "token_type"=>"Bearer",
+                "expires_in"=> 86400,
+                "access_token"=>"new_created_token",
+                "scope"=>"open-api"
+            ]);
         $guestyClient = new GuestyClient(
             "test_client_id",
             "test_client_secret",
             $client
         );
-        $token = $guestyClient->fetchNewToken();
-        print_r( $token);
+        [$token,$expires] = $guestyClient->fetchNewToken();
+        $this->assertEquals($token,'new_created_token');
+        $this->assertEquals($expires,'86400');
     }
 
     public function testRequestResourceNormalWorkflow()
     {
         /** @var ClientWrapper&MockObject $client*/
         $client = $this->createMock(ClientWrapper::class);
-        $client->method('request')
-            ->willReturn(["aaa"]);
+        $client->expects($this->once())
+            ->method('request')
+            ->with(
+                $this->equalTo(['GET','/v1/guests']),
+                $this->equalTo([
+                    'Authorization: Basic token_in_effective',
+                    'Content-Type: application/json'
+                ]),
+                $this->equalTo(['fields' => '_id'])
+            )
+            ->willReturn([
+                //sample guests data
+            ]);
         $guestyClient = new GuestyClient(
             "test_client_id",
             "test_client_secret",
-            $client
+            $client,
+            'token_in_effective'
         );
         $guestCount = $guestyClient->getGuestCount();
         //verify result correct
