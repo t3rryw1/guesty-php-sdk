@@ -9,7 +9,7 @@ interface IUpdatableTokenClient{
 
     function setTokenUpdateCallback(callable $callback);
 
-    function optimisticRequestWithToken($urlArray, $params):mixed;
+    function optimisticRequestWithToken($urlArray, $params): array;
 
     function isRequestTokenExpired($response):bool;
 

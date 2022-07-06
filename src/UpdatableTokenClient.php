@@ -2,16 +2,31 @@
 
 namespace Cozy\Lib\Guesty;
 
+use Exception;
+use Exceptions\Http\Client\BadRequestException;
+use Exceptions\Http\Client\ForbiddenException;
+use Exceptions\Http\Client\GoneException;
+use Exceptions\Http\Client\MethodNotAllowedException;
+use Exceptions\Http\Client\NotAcceptableException;
+use Exceptions\Http\Client\NotFoundException;
+use Exceptions\Http\Client\TooManyRequestsException;
+use Exceptions\Http\Server\InternalServerErrorException;
+use Exceptions\Http\Server\ServiceUnavailableException;
+use Exceptions\IO\Network\UnknownHostException;
+
 abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     /** @var callable */
     protected $tokenUpdateCallback;
-    private $client;
+    protected $client;
     protected $token;
+    protected $expiredAt;
 
-    function __construct($baseUrl,string $token=null)
+    function __construct(ClientWrapper $client, string $token=null, string $expiredAt=null)
     {
-        $this->client =new ClientWrapper($baseUrl,$token);
+        $this->client =$client;
         $this->token=$token;
+        //TODO: handle expires logic 
+        $this->expiredAt=$expiredAt;
     }
 
     function setTokenUpdateCallback(callable $callback){
@@ -21,8 +36,8 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
 
     private function buildHeader(){
         return array(
-            "Authorization: Basic {$this->token}",
-            "Content-Type: application/json"
+            "Authorization: Bearer {$this->token}",
+            "accept: application/json"
         );
     }
 
@@ -32,27 +47,58 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
             call_user_func($this->tokenUpdateCallback,$token,$expired);
         }
         $this->token = $token;
-        return $this->client->request(
+        $res= $this->client->request(
+            $urlArray,
+            $this->buildHeader(),
+            $params);
+        $responseCode = $this->client->getLastResponseCode();
+        $this->throwException($responseCode);
+        return $res;
+    }
+
+    private function throwException($code){
+        if($code >=400){
+            switch($code){
+                case 503:
+                    throw new ServiceUnavailableException("",$code);
+                case 500:
+                    throw new InternalServerErrorException("",$code);
+                case 429:
+                    throw new TooManyRequestsException("",$code);
+                case 410:
+                    throw new GoneException("",$code);
+                case 406:
+                    throw new NotAcceptableException("",$code);
+                case 405:
+                    throw new MethodNotAllowedException("",$code);
+                case 404:
+                    throw new NotFoundException("",$code);
+                case 403:
+                    throw new ForbiddenException("",$code);
+                default:
+                    throw new Exception("Unknown exception",$code);
+            }    
+        }
+    }
+
+    function optimisticRequestWithToken($urlArray, $params):array{
+        if(!$this->token){
+            return $this->refetchTokenAndRequest($urlArray, $params);
+        }
+        $response = $this->client->request(
             $urlArray,
             $this->buildHeader(),
             $params);
 
-    }
-
-    function optimisticRequestWithToken($urlArray, $params){
-        if($this->token){
-            $response = $this->client->request(
-                $urlArray,
-                $this->buildHeader(),
-                $params);
-            if($this->isRequestTokenExpired($response)){
+        $responseCode = $this->client->getLastResponseCode();
+        if($responseCode >=400){
+            if($responseCode===401){
                 return $this->refetchTokenAndRequest($urlArray, $params);
             }else{
-                return $response;
+                $this->throwException($responseCode);
             }
+        }else{
+            return $response;
         }
-        return $this->refetchTokenAndRequest($urlArray, $params);
     }
-
-
 }

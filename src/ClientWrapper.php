@@ -15,7 +15,7 @@ class ClientWrapper
     public function __construct($baseUrl, $logger=null)
     {
         $this->client = new HttpClient($baseUrl);
-        $this->logger= $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -25,7 +25,7 @@ class ClientWrapper
      * @return array|mixed
      * @throws LauraException
      */
-    public function request($urlArray, $header, $data)
+    public function request($urlArray, $header, $data, $jsonEncode = true)
     {
         extract($data);
         $template = $urlArray[1];
@@ -39,7 +39,9 @@ class ClientWrapper
         switch (strtolower($urlArray[0])) {
 
             case "post":
-                $data = json_encode($data);
+                if ($jsonEncode) {
+                    $data = json_encode($data);
+                }
                 $response = $this->client->post($template, $header, $data);
                 break;
             case "get":
@@ -51,7 +53,9 @@ class ClientWrapper
                 $response = $this->client->get($template . $query, $header);
                 break;
             case "put":
-                $data = json_encode($data);
+                if ($jsonEncode) {
+                    $data = json_encode($data);
+                }
                 $response = $this->client->put($template, $header, $data);
                 break;
             case "delete":
@@ -76,5 +80,9 @@ class ClientWrapper
             $data = $response;
         }
         return $data;
+    }
+
+    public function getLastResponseCode(){
+        return $this->client->getResponseCode()??null;
     }
 }
