@@ -8,6 +8,15 @@ use Exceptions\IO\Network\UnexpectedResponseException;
 class HttpClient
 {
     private $baseUrl;
+    private $responseCode;
+    
+    function getResponseCode(){
+        return $this->responseCode;
+    }
+
+    function setResponseCode($code){
+        $this->responseCode = $code;
+    }
 
     public function __construct($baseUrl = null)
     {
@@ -37,9 +46,11 @@ class HttpClient
 
         $server_output = curl_exec($ch);
 
+
         if (curl_errno($ch)) {
             throw new UnexpectedResponseException(curl_error($ch));
         }
+        $this->setResponseCode(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
 
         curl_close($ch);
 
@@ -78,6 +89,7 @@ class HttpClient
             throw new UnexpectedResponseException(curl_error($ch));
         }
 
+        $this->setResponseCode(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
 
         curl_close($ch);
 
@@ -119,6 +131,8 @@ class HttpClient
             throw new UnexpectedResponseException(curl_error($ch));
         }
 
+        $this->setResponseCode(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
+
         curl_close($ch);
 
         if (strcasecmp($server_output, 'ok') == 0) {
@@ -152,6 +166,7 @@ class HttpClient
         if (curl_errno($ch)) {
             throw new UnexpectedResponseException(curl_error($ch));
         }
+        $this->setResponseCode(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
 
         curl_close($ch);
 

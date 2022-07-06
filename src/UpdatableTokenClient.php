@@ -9,7 +9,7 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     protected $token;
     protected $expiredAt;
 
-    function __construct($client, string $token=null, string $expiredAt=null)
+    function __construct(ClientWrapper $client, string $token=null, string $expiredAt=null)
     {
         $this->client =$client;
         $this->token=$token;
@@ -24,8 +24,8 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
 
     private function buildHeader(){
         return array(
-            "Authorization: Basic {$this->token}",
-            "Content-Type: application/json"
+            "Authorization: Bearer {$this->token}",
+            "accept: application/json"
         );
     }
 
@@ -42,7 +42,7 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
 
     }
 
-    function optimisticRequestWithToken($urlArray, $params):mixed{
+    function optimisticRequestWithToken($urlArray, $params):array{
         if($this->token){
             $response = $this->client->request(
                 $urlArray,

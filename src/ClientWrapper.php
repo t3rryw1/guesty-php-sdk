@@ -81,4 +81,8 @@ class ClientWrapper
         }
         return $data;
     }
+
+    public function getLastResponseCode(){
+        return $this->client->getResponseCode()??null;
+    }
 }

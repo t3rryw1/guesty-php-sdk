@@ -43,9 +43,9 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
 
     function fetchNewToken():array
     {
-        $authHeader = array(
+        $authHeader = [
             "accept: application/json"
-        );
+        ];
         $authData = [
             'grant_type' => 'client_credentials',
             'scope' => 'open-api',
@@ -58,14 +58,16 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             $authData,
             false
         );
-        return [$res['access_token'],$res['expires_in']];
+        return [
+            $res['access_token'],
+            $res['expires_in']
+        ];
         // we need to parse result here and return token.
     }
 
     function isRequestTokenExpired($response):bool
     {
-        return true;
-        // TODO: Implement isRequestTokenExpired() method.
+        return $this->client->getLastResponseCode()===401;
     }
 
     /**
