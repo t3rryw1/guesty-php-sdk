@@ -2,8 +2,9 @@
 
 namespace Cozy\Lib\Guesty;
 
+use JetBrains\PhpStorm\NoReturn;
 
-class GuestyClient extends AbstractClient
+class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
 {
     public const BASE_URL = "https://api.guesty.com/api/v2/";
 
@@ -23,15 +24,21 @@ class GuestyClient extends AbstractClient
     public const UPDATE_CONVERSATION = ["PUT", "owner-inbox/conversations/{conversationId}"];
     public const UPDATE_RESERVATION = ["PUT", "/reservations/{reservationId}"];
 
-    private $token;
-
     public function __construct($token)
     {
-        parent::__construct(self::BASE_URL);
-        $this->token = array(
-            "Authorization: Basic $token",
-            "Content-Type: application/json"
-        );
+        parent::__construct(self::BASE_URL,$token);
+    }
+
+    function isRequestTokenExpired($response):bool
+    {
+        //TODO: implement
+        return true;
+    }
+
+    function fetchNewToken(): array
+    {
+        //TODO: implement
+        return [];
     }
 
     /**
@@ -41,27 +48,24 @@ class GuestyClient extends AbstractClient
      */
     public function newReservation($data)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::NEW_RESERVATION_URL,
-            $this->token,
             $data,
         );
     }
 
     public function retrieveReservation($reservationId)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::RETRIEVE_RESERVATION,
-            $this->token,
             compact("reservationId")
         );
     }
 
     public function updateReservation($data)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::UPDATE_RESERVATION,
-            $this->token,
             $data
         );
     }
@@ -74,18 +78,16 @@ class GuestyClient extends AbstractClient
 
     public function updateListing($data)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::UPDATE_LISTING_INFO,
-            $this->token,
             $data
         );
     }
 
     public function getListing($listingId)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::GET_LISTING_URL,
-            $this->token,
             compact("listingId"),
         );
     }
@@ -119,9 +121,8 @@ class GuestyClient extends AbstractClient
         $price = intval($price);
         $data = array_filter(compact('listingId', 'startDate', 'endDate', 'status', 'price', 'minNights'));
         isset($note) && $data['note'] = $note;
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::UPDATE_LISTING_CALENDARS,
-            $this->token,
             $data
         );
     }
@@ -132,9 +133,8 @@ class GuestyClient extends AbstractClient
      */
     public function updateMultipleListingCalendar($data)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::UPDATE_MULTIPLE_LISTING_CALENDARS,
-            $this->token,
             $data
         );
     }
@@ -148,9 +148,8 @@ class GuestyClient extends AbstractClient
      */
     public function getMultipleListingCalendars($guestyIds, $startDate, $endDate)
     {
-        $res= $this->request(
+        $res= $this->optimisticRequestWithToken(
             self::BATCH_LISTING_CALENDARS,
-            $this->token,
             [
                 "listingIds" => implode(",", $guestyIds),
                 "startDate" => $startDate,
@@ -162,9 +161,8 @@ class GuestyClient extends AbstractClient
 
     public function getListingCount()
     {
-        $res = $this->request(
+        $res = $this->optimisticRequestWithToken(
             self::LISTINGS,
-            $this->token,
             [
                 "fields" => "_id",
                 "limit" => 1
@@ -179,19 +177,16 @@ class GuestyClient extends AbstractClient
         if ($skip === 0) {
             if ($ids != null) {
                 $idStr = implode(",", $ids);
-                $result = $this->requestArray(
+                $result = $this->optimisticRequestWithToken(
                     self::LISTINGS,
-                    $this->token,
                     [
                         "ids" => $idStr,
                         "limit" => $limit
                     ],
-                    'results',
                 );
             } else {
-                $result = $this->requestArray(
+                $result = $this->optimisticRequestWithToken(
                     self::LISTINGS,
-                    $this->token,
                     ["limit" => $limit],
                     'results',
                 );
@@ -200,33 +195,28 @@ class GuestyClient extends AbstractClient
             if ($ids != null) {
                 $idStr = implode(",", $ids);
 
-                $result = $this->requestArray(
+                $result = $this->optimisticRequestWithToken(
                     self::LISTINGS,
-                    $this->token,
                     [
                         "ids" => $idStr,
                         "limit" => $limit,
                         "skip" => $skip],
-                    'results',
                 );
             } else {
-                $result = $this->requestArray(
+                $result = $this->optimisticRequestWithToken(
                     self::LISTINGS,
-                    $this->token,
                     ["limit" => $limit, "skip" => $skip],
-                    'results',
                 );
             }
         }
 
-        return $result;
+        return $result['results'];
     }
 
     public function getGuestCount()
     {
-        $res = $this->request(
+        $res = $this->optimisticRequestWithToken(
             self::GUESTS,
-            $this->token,
             [
                 "fields" => "_id",
             ]
@@ -238,33 +228,26 @@ class GuestyClient extends AbstractClient
     public function getGuests(int $skip, $limit)
     {
         if ($skip === 0) {
-            $result = $this->requestArray(
+            $result = $this->optimisticRequestWithToken(
                 self::GUESTS,
-                $this->token,
                 ["limit" => $limit],
-                'results'
             );
         } else {
-            $result = $this->requestArray(
+            $result = $this->optimisticRequestWithToken(
                 self::GUESTS,
-                $this->token,
                 ["limit" => $limit, "skip" => $skip],
-                'results'
             );
         }
 
-        return $result;
+        return $result['results'];
     }
 
     public function getGuest($guestId)
     {
-        $result = $this->request(
+        return $this->optimisticRequestWithToken(
             self::GUEST_DETAIL,
-            $this->token,
             compact('guestId')
         );
-
-        return $result;
     }
 
     /**
@@ -277,9 +260,8 @@ class GuestyClient extends AbstractClient
      */
     public function getConversations($cursorAfter, $limit, $sort, $fields)
     {
-        $result = $this->requestArray(
+        $result = $this->optimisticRequestWithToken(
             self::CONVERSATIONS,
-            $this->token,
             array_filter(compact("limit", "sort", "cursorAfter", "fields")),
             'data'
         );
@@ -296,9 +278,8 @@ class GuestyClient extends AbstractClient
      */
     public function getConversationDetail($conversationId, $cursorAfter, $limit, $sort)
     {
-        $result = $this->request(
+        $result = $this->optimisticRequestWithToken(
             self::CONVERSATION_DETAIL,
-            $this->token,
             array_filter(compact('conversationId', 'cursorAfter', 'limit', 'sort'))
         );
 
@@ -311,9 +292,8 @@ class GuestyClient extends AbstractClient
      */
     public function newMessage($data)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::NEW_MESSAGE,
-            $this->token,
             $data
         );
     }
@@ -324,9 +304,8 @@ class GuestyClient extends AbstractClient
      */
     public function updateConversation($data)
     {
-        return $this->request(
+        return $this->optimisticRequestWithToken(
             self::UPDATE_CONVERSATION,
-            $this->token,
             $data
         );
     }

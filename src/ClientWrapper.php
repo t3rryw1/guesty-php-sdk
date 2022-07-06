@@ -4,7 +4,7 @@ namespace Cozy\Lib\Guesty;
 
 use Exceptions\Http\Client\MethodNotAllowedException;
 
-class AbstractClient
+class ClientWrapper
 {
     /**
      * @var HttpClient
@@ -12,7 +12,7 @@ class AbstractClient
     private $client;
     private $logger;
 
-    public function __construct($baseUrl,$logger=null)
+    public function __construct($baseUrl, $logger=null)
     {
         $this->client = new HttpClient($baseUrl);
         $this->logger= $logger;
@@ -75,58 +75,6 @@ class AbstractClient
         if (is_null($data)) {
             $data = $response;
         }
-        return $data;
-    }
-
-    /**
-     * @param $urlArray
-     * @param $header
-     * @param $data
-     * @param string $key
-     * @param ArrayMapper $mapper
-     * @return mixed
-     * @throws LauraException
-     */
-    public function requestArray($urlArray, $header, $data, $key, &$mapper = null)
-    {
-        extract($data);
-        $template = $urlArray[1];
-        if (preg_match_all("/{(.*?)}/", $urlArray[1], $m)) {
-            foreach ($m[1] as $i => $varname) {
-                $template = str_replace($m[0][$i], sprintf('%s', $$varname), $template);
-                unset($data[$varname]);
-            }
-        }
-
-        switch (strtolower($urlArray[0])) {
-
-            case "post":
-                $response = $this->client->post($template, $header, $data);
-                break;
-            case "get":
-                if ($data) {
-                    $query = '?' . http_build_query($data);
-                } else {
-                    $query = '';
-                }
-                $response = $this->client->get($template . $query, $header);
-                break;
-            case "put":
-                $response = $this->client->put($template, $header, $data);
-                break;
-            case "delete":
-                if ($data) {
-                    $query = '?' . http_build_query($data);
-                } else {
-                    $query = '';
-                }
-                $response = $this->client->delete($template . $query, $header);
-                break;
-            default:
-                throw new MethodNotAllowedException("invalid request type");
-        }
-
-        $data = json_decode($response, true);
         return $data;
     }
 }
