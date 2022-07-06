@@ -2,6 +2,9 @@
 
 namespace Cozy\Lib\Guesty;
 
+use Exceptions\Http\Client\BadRequestException;
+use Exceptions\Http\Client\NotFoundException;
+
 abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     /** @var callable */
     protected $tokenUpdateCallback;
@@ -35,27 +38,44 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
             call_user_func($this->tokenUpdateCallback,$token,$expired);
         }
         $this->token = $token;
-        return $this->client->request(
+        $res= $this->client->request(
+            $urlArray,
+            $this->buildHeader(),
+            $params);
+        $responseCode = $this->client->getLastResponseCode();
+        $this->throwException($responseCode);
+        return $res;
+    }
+
+    private function throwException($code){
+        if($code >=400){
+            switch($code){
+                case 404:
+                    throw new NotFoundException($code);
+                default:
+                    throw new BadRequestException($code);
+            }    
+        }
+    }
+
+    function optimisticRequestWithToken($urlArray, $params):array{
+        if(!$this->token){
+            return $this->refetchTokenAndRequest($urlArray, $params);
+        }
+        $response = $this->client->request(
             $urlArray,
             $this->buildHeader(),
             $params);
 
-    }
-
-    function optimisticRequestWithToken($urlArray, $params):array{
-        if($this->token){
-            $response = $this->client->request(
-                $urlArray,
-                $this->buildHeader(),
-                $params);
-            if($this->isRequestTokenExpired($response)){
+        $responseCode = $this->client->getLastResponseCode();
+        if($responseCode >=400){
+            if($responseCode===401){
                 return $this->refetchTokenAndRequest($urlArray, $params);
             }else{
-                return $response;
+                $this->throwException($responseCode);
             }
+        }else{
+            return $response;
         }
-        return $this->refetchTokenAndRequest($urlArray, $params);
     }
-
-
 }
