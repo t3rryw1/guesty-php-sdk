@@ -32,7 +32,7 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
             call_user_func($this->tokenUpdateCallback,$token,$expired);
         }
         $this->token = $token;
-        return$this->client->request(
+        return $this->client->request(
             $urlArray,
             $this->buildHeader(),
             $params);
