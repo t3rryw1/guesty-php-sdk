@@ -25,8 +25,6 @@ class GuestyClientTest extends TestCase
         print_r( $token);
     }
 
-    
-
     public function testRequestResourceNormalWorkflow()
     {
         /** @var ClientWrapper&MockObject $client*/
