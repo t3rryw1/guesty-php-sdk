@@ -2,8 +2,17 @@
 
 namespace Cozy\Lib\Guesty;
 
+use Exception;
 use Exceptions\Http\Client\BadRequestException;
+use Exceptions\Http\Client\ForbiddenException;
+use Exceptions\Http\Client\GoneException;
+use Exceptions\Http\Client\MethodNotAllowedException;
+use Exceptions\Http\Client\NotAcceptableException;
 use Exceptions\Http\Client\NotFoundException;
+use Exceptions\Http\Client\TooManyRequestsException;
+use Exceptions\Http\Server\InternalServerErrorException;
+use Exceptions\Http\Server\ServiceUnavailableException;
+use Exceptions\IO\Network\UnknownHostException;
 
 abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     /** @var callable */
@@ -50,10 +59,24 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     private function throwException($code){
         if($code >=400){
             switch($code){
+                case 503:
+                    throw new ServiceUnavailableException("",$code);
+                case 500:
+                    throw new InternalServerErrorException("",$code);
+                case 429:
+                    throw new TooManyRequestsException("",$code);
+                case 410:
+                    throw new GoneException("",$code);
+                case 406:
+                    throw new NotAcceptableException("",$code);
+                case 405:
+                    throw new MethodNotAllowedException("",$code);
                 case 404:
-                    throw new NotFoundException($code);
+                    throw new NotFoundException("",$code);
+                case 403:
+                    throw new ForbiddenException("",$code);
                 default:
-                    throw new BadRequestException($code);
+                    throw new Exception("Unknown exception",$code);
             }    
         }
     }
