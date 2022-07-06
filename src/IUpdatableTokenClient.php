@@ -5,12 +5,12 @@ namespace Cozy\Lib\Guesty;
 
 interface IUpdatableTokenClient{
 
-    function fetchNewToken();
+    function fetchNewToken():array;
 
     function setTokenUpdateCallback(callable $callback);
 
-    function optimisticRequestWithToken($method, $url, $params);
+    function optimisticRequestWithToken($urlArray, $params):mixed;
 
-    function isRequestTokenExpired($response);
+    function isRequestTokenExpired($response):bool;
 
 }

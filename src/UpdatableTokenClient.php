@@ -2,7 +2,6 @@
 
 namespace Cozy\Lib\Guesty;
 
-
 abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     /** @var callable */
     protected $tokenUpdateCallback;
@@ -17,28 +16,42 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
 
     function setTokenUpdateCallback(callable $callback){
         $this->tokenUpdateCallback = $callback;
+        return $this;
     }
 
-    private function refetchTokenAndRequest($method, $url, $params){
+    private function buildHeader(){
+        return array(
+            "Authorization: Basic {$this->token}",
+            "Content-Type: application/json"
+        );
+    }
+
+    private function refetchTokenAndRequest($urlArray, $params){
         [$token,$expired]= $this->fetchNewToken();
         if($this->tokenUpdateCallback){
             call_user_func($this->tokenUpdateCallback,$token,$expired);
         }
         $this->token = $token;
-        return$this->client->request([$method, $url],$params);
+        return$this->client->request(
+            $urlArray,
+            $this->buildHeader(),
+            $params);
 
     }
 
-    function optimisticRequestWithToken($method, $url, $params){
+    function optimisticRequestWithToken($urlArray, $params){
         if($this->token){
-            $response = $this->client->request([$method, $url],$params);
+            $response = $this->client->request(
+                $urlArray,
+                $this->buildHeader(),
+                $params);
             if($this->isRequestTokenExpired($response)){
-                return $this->refetchTokenAndRequest($method, $url, $params);
+                return $this->refetchTokenAndRequest($urlArray, $params);
             }else{
                 return $response;
             }
         }
-        return $this->refetchTokenAndRequest($method, $url, $params);
+        return $this->refetchTokenAndRequest($urlArray, $params);
     }
 
 

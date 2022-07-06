@@ -11,15 +11,10 @@ class ClientWrapper
      */
     private $client;
     private $logger;
-    private $header;
 
     public function __construct($baseUrl,$token, $logger=null)
     {
         $this->client = new HttpClient($baseUrl);
-        $this->header = array(
-            "Authorization: Basic $token",
-            "Content-Type: application/json"
-        );
         $this->logger= $logger;
     }
 
@@ -38,7 +33,7 @@ class ClientWrapper
      * @return array|mixed
      * @throws LauraException
      */
-    public function request($urlArray, $data)
+    public function request($urlArray, $header, $data)
     {
         extract($data);
         $template = $urlArray[1];
