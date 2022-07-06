@@ -28,43 +28,37 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     protected $token;
     private $client_secret;
     private $client_id;
-    private $header;
-    private $expiresAt;
 
     public function __construct($client_id, $client_secret, $token = null, $expiresAt = null)
     {
-        parent::__construct(self::BASE_URL);
-        $this->header = array(
-            "Accept: application/json",
-            "Authorization: Bearer $token"
-        );
+        parent::__construct(self::BASE_URL,$token,$expiresAt);
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
-        $this->expiresAt = $expiresAt;
     }
 
-    function fetchNewToken()
+    function fetchNewToken():array
     {
-        $auth_header = array(
+        $authHeader = array(
             "accept: application/json"
         );
-        $auth_data = [
+        $authData = [
             'grant_type' => 'client_credentials',
             'scope' => 'open-api',
             'client_secret' => $this->client_secret,
             'client_id' => $this->client_id
         ];
-        return $this->request(
+        return $this->client->request(
             self::AUTH_TOKEN_URL,
-            $auth_header,
-            $auth_data,
+            $authHeader,
+            $authData,
             false
         );
         //TODO: we need to parse result here and return token.
     }
 
-    function isRequestTokenExpired($response)
+    function isRequestTokenExpired($response):bool
     {
+        return true;
         // TODO: Implement isRequestTokenExpired() method.
     }
 

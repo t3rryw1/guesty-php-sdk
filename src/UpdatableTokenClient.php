@@ -5,13 +5,16 @@ namespace Cozy\Lib\Guesty;
 abstract class UpdatableTokenClient implements IUpdatableTokenClient{
     /** @var callable */
     protected $tokenUpdateCallback;
-    private $client;
+    protected $client;
     protected $token;
+    protected $expiredAt;
 
-    function __construct($baseUrl,string $token=null)
+    function __construct($baseUrl,string $token=null,$expiredAt=null)
     {
-        $this->client =new ClientWrapper($baseUrl,$token);
+        $this->client =new ClientWrapper($baseUrl);
         $this->token=$token;
+        //TODO: handle expires logic 
+        $this->expiredAt=$expiredAt;
     }
 
     function setTokenUpdateCallback(callable $callback){
@@ -39,7 +42,7 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
 
     }
 
-    function optimisticRequestWithToken($urlArray, $params){
+    function optimisticRequestWithToken($urlArray, $params):mixed{
         if($this->token){
             $response = $this->client->request(
                 $urlArray,
