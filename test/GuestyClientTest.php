@@ -14,6 +14,5 @@ class GuestyClientTest extends TestCase
         $guesty_client_secret="";
         $guestyClient = new GuestyClient($guesty_client_id, $guesty_client_secret,);
         $token = $guestyClient->fetchNewToken();
-        print_r( $token);
     }
 }
