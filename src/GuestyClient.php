@@ -33,18 +33,18 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         $clientId,
         $clientSecret,
         $client,
-        $token = null, 
+        $token = null,
         $expiresAt = null)
     {
-        parent::__construct($client,$token,$expiresAt);
+        parent::__construct($client, $token, $expiresAt);
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
     }
 
-    function fetchNewToken():array
+    function fetchNewToken(): array
     {
         $authHeader = [
-            "accept: application/json"
+            "Accept: application/json"
         ];
         $authData = [
             'grant_type' => 'client_credentials',
@@ -52,12 +52,14 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             'client_secret' => $this->clientSecret,
             'client_id' => $this->clientId
         ];
-        $res= $this->client->request(
+        $res = $this->client->request(
             self::AUTH_TOKEN_URL,
             $authHeader,
             $authData,
             false
         );
+        $responseCode = $this->client->getLastResponseCode();
+        $this->throwException($responseCode);
         return [
             $res['access_token'],
             $res['expires_in']
@@ -65,9 +67,9 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         // we need to parse result here and return token.
     }
 
-    function isRequestTokenExpired($response):bool
+    function isRequestTokenExpired($response): bool
     {
-        return $this->client->getLastResponseCode()===401;
+        return $this->client->getLastResponseCode() === 401;
     }
 
     /**
@@ -99,12 +101,6 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         );
     }
 
-
-    public function newListing($data)
-    {
-        //TODO: implementation
-    }
-
     public function updateListing($data)
     {
         return $this->optimisticRequestWithToken(
@@ -120,13 +116,6 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             compact("listingId"),
         );
     }
-
-
-    public function newGuest($data)
-    {
-        //TODO: implementation
-    }
-
 
     /**
      * @param $listingId
@@ -178,7 +167,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
      */
     public function getMultipleListingCalendars($guestyIds, $startDate, $endDate)
     {
-        $res= $this->optimisticRequestWithToken(
+        $res = $this->optimisticRequestWithToken(
             self::BATCH_LISTING_CALENDARS,
             [
                 "listingIds" => implode(",", $guestyIds),
@@ -217,8 +206,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             } else {
                 $result = $this->optimisticRequestWithToken(
                     self::LISTINGS,
-                    ["limit" => $limit],
-                    'results',
+                    ["limit" => $limit]
                 );
             }
         } else {

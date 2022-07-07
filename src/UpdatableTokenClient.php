@@ -12,42 +12,45 @@ use Exceptions\Http\Client\NotFoundException;
 use Exceptions\Http\Client\TooManyRequestsException;
 use Exceptions\Http\Server\InternalServerErrorException;
 use Exceptions\Http\Server\ServiceUnavailableException;
-use Exceptions\IO\Network\UnknownHostException;
 
-abstract class UpdatableTokenClient implements IUpdatableTokenClient{
+abstract class UpdatableTokenClient implements IUpdatableTokenClient
+{
     /** @var callable */
     protected $tokenUpdateCallback;
     protected $client;
     protected $token;
     protected $expiredAt;
 
-    function __construct(ClientWrapper $client, string $token=null, string $expiredAt=null)
+    function __construct(ClientWrapper $client, string $token = null, string $expiredAt = null)
     {
-        $this->client =$client;
-        $this->token=$token;
+        $this->client = $client;
+        $this->token = $token;
         //TODO: handle expires logic 
-        $this->expiredAt=$expiredAt;
+        $this->expiredAt = $expiredAt;
     }
 
-    function setTokenUpdateCallback(callable $callback){
+    function setTokenUpdateCallback(callable $callback)
+    {
         $this->tokenUpdateCallback = $callback;
         return $this;
     }
 
-    private function buildHeader(){
+    private function buildHeader()
+    {
         return array(
             "Authorization: Bearer {$this->token}",
-            "accept: application/json"
+            "Accept: application/json"
         );
     }
 
-    private function refetchTokenAndRequest($urlArray, $params){
-        [$token,$expired]= $this->fetchNewToken();
-        if($this->tokenUpdateCallback){
-            call_user_func($this->tokenUpdateCallback,$token,$expired);
+    private function refetchTokenAndRequest($urlArray, $params)
+    {
+        [$token, $expired] = $this->fetchNewToken();
+        if ($this->tokenUpdateCallback) {
+            call_user_func($this->tokenUpdateCallback, $token, $expired);
         }
         $this->token = $token;
-        $res= $this->client->request(
+        $res = $this->client->request(
             $urlArray,
             $this->buildHeader(),
             $params);
@@ -56,33 +59,37 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
         return $res;
     }
 
-    private function throwException($code){
-        if($code >=400){
-            switch($code){
+    protected function throwException($code)
+    {
+        if ($code >= 400) {
+            switch ($code) {
                 case 503:
-                    throw new ServiceUnavailableException("",$code);
+                    throw new ServiceUnavailableException("", $code);
                 case 500:
-                    throw new InternalServerErrorException("",$code);
+                    throw new InternalServerErrorException("", $code);
                 case 429:
-                    throw new TooManyRequestsException("",$code);
+                    throw new TooManyRequestsException("", $code);
                 case 410:
-                    throw new GoneException("",$code);
+                    throw new GoneException("", $code);
                 case 406:
-                    throw new NotAcceptableException("",$code);
+                    throw new NotAcceptableException("", $code);
                 case 405:
-                    throw new MethodNotAllowedException("",$code);
+                    throw new MethodNotAllowedException("", $code);
                 case 404:
-                    throw new NotFoundException("",$code);
+                    throw new NotFoundException("", $code);
                 case 403:
-                    throw new ForbiddenException("",$code);
+                    throw new ForbiddenException("", $code);
+                case 400:
+                    throw new BadRequestException("", $code);
                 default:
-                    throw new Exception("Unknown exception",$code);
-            }    
+                    throw new Exception("Unknown exception", $code);
+            }
         }
     }
 
-    function optimisticRequestWithToken($urlArray, $params):array{
-        if(!$this->token){
+    function optimisticRequestWithToken($urlArray, $params): array
+    {
+        if (!$this->token) {
             return $this->refetchTokenAndRequest($urlArray, $params);
         }
         $response = $this->client->request(
@@ -91,14 +98,13 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient{
             $params);
 
         $responseCode = $this->client->getLastResponseCode();
-        if($responseCode >=400){
-            if($responseCode===401){
+        if ($responseCode >= 400) {
+            if ($responseCode === 401) {
                 return $this->refetchTokenAndRequest($urlArray, $params);
-            }else{
+            } else {
                 $this->throwException($responseCode);
             }
-        }else{
-            return $response;
         }
+        return $response;
     }
 }

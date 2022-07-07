@@ -9,12 +9,14 @@ class HttpClient
 {
     private $baseUrl;
     private $responseCode;
-    
-    function getResponseCode(){
+
+    function getResponseCode()
+    {
         return $this->responseCode;
     }
 
-    function setResponseCode($code){
+    function setResponseCode($code)
+    {
         $this->responseCode = $code;
     }
 
@@ -29,7 +31,7 @@ class HttpClient
      * @param $url
      * @param $headerArray
      * @return bool|string
-     * @throws LauraException
+     * @throws UnexpectedResponseException
      */
     public function get($url, $headerArray)
     {
@@ -45,15 +47,12 @@ class HttpClient
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headerArray);
 
         $server_output = curl_exec($ch);
-
-
         if (curl_errno($ch)) {
             throw new UnexpectedResponseException(curl_error($ch));
         }
         $this->setResponseCode(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
 
         curl_close($ch);
-
         return $server_output;
     }
 
@@ -62,11 +61,10 @@ class HttpClient
      * @param $headerArray
      * @param $data
      * @return bool|string
-     * @throws LauraException
+     * @throws UnexpectedResponseException
      */
     public function post($url, $headerArray, $data)
     {
-        print_r($data);
         if ($this->baseUrl) {
             $url = trim($this->baseUrl . '/', '/') . "/" . ltrim($url, '/');
         }
@@ -105,7 +103,7 @@ class HttpClient
      * @param $headerArray
      * @param $data
      * @return bool|string
-     * @throws LauraException
+     * @throws UnexpectedResponseException
      */
     public function put($url, $headerArray, $data)
     {
@@ -146,7 +144,7 @@ class HttpClient
      * @param $url
      * @param $headerArray
      * @return bool|string
-     * @throws LauraException
+     * @throws UnexpectedResponseException
      */
     public function delete($url, $headerArray)
     {
