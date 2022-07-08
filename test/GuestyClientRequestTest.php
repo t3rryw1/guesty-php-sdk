@@ -25,16 +25,18 @@ class GuestyClientRequestTest extends TestCase
             $client,
             $token
         );
-        echo self::$guestyClient->getToken();
+        self::$guestyClient->setTokenUpdateCallback(function ($token) {
+            echo $token;
+        });
     }
 
-    public function testGuestyRequests()
+    public function testGuestyEndPoints()
     {
         //guest count
         $res = self::$guestyClient->getGuestCount();
         $this->assertEquals(gettype($res), 'integer');
         //guest list
-        $res = self::$guestyClient->getGuests(5,5);
+        $res = self::$guestyClient->getGuests(5, 5);
         $this->assertEquals(sizeof($res), 5);
         if (sizeof($res) === 5) {
             $guestId = $res[0]['_id'];
@@ -47,7 +49,7 @@ class GuestyClientRequestTest extends TestCase
         $res = self::$guestyClient->getListingCount();
         $this->assertEquals(gettype($res), 'integer');
         //get listings
-        $res = self::$guestyClient->getListings(0,5);
+        $res = self::$guestyClient->getListings(0, 5);
         $this->assertEquals(sizeof($res), 5);
         if (sizeof($res) === 5) {
             $listingId = $res[0]['_id'];
@@ -56,8 +58,14 @@ class GuestyClientRequestTest extends TestCase
         $res = self::$guestyClient->getListing($listingId ?? null);
         $this->assertEquals($listingId, $res['_id']);
 
+        //get reservation list
+        $res = self::$guestyClient->retrieveReservationList(0, 5);
+        $this->assertEquals(sizeof($res), 5);
+        if (sizeof($res) === 5) {
+            $reservationId = $res[0]['_id'];
+        }
         //get reservation
-        $res = self::$guestyClient->retrieveReservation('5c436b5ab1d05b00335bd517');
-        $this->assertEquals('5c436b5ab1d05b00335bd517', $res['_id']);
+        $res = self::$guestyClient->retrieveReservation($reservationId);
+        $this->assertEquals($reservationId, $res['_id']);
     }
 }

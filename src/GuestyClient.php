@@ -11,6 +11,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const AUTH_TOKEN_URL = ["POST", "/oauth2/token"];
     public const NEW_RESERVATION_URL = ["POST", "/v1/reservations"];
     public const RETRIEVE_RESERVATION = ["GET", "/v1/reservations/{reservationId}"];
+    public const RETRIEVE_RESERVATION_LIST = ["GET", "/v1/reservations"];
     public const GET_LISTING_URL = ["GET", "/v1/listings/{listingId}"];
     public const BATCH_LISTING_CALENDARS = ["GET", "/v1/availability-pricing/api/calendar/listings"];
     public const UPDATE_LISTING_CALENDARS = ["PUT", "/v1/availability-pricing/api/calendar/listings/{listingId}"];
@@ -91,6 +92,22 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             self::RETRIEVE_RESERVATION,
             compact("reservationId")
         );
+    }
+
+    public function retrieveReservationList($skip, $limit)
+    {
+        if ($skip === 0) {
+            $result = $this->optimisticRequestWithToken(
+                self::RETRIEVE_RESERVATION_LIST,
+                ["limit" => $limit],
+            );
+        } else {
+            $result = $this->optimisticRequestWithToken(
+                self::RETRIEVE_RESERVATION_LIST,
+                ["limit" => $limit, "skip" => $skip],
+            );
+        }
+        return $result['results'];
     }
 
     public function updateReservation($data)
