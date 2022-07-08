@@ -107,4 +107,12 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
         }
         return $response;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
 }

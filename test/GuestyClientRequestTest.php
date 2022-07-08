@@ -9,55 +9,55 @@ use PHPUnit\Framework\TestCase;
 
 class GuestyClientRequestTest extends TestCase
 {
-    private $test_client_id;
-    private $token;
-    private $test_client_secret;
-    private $guestyClient;
+    private static $guestyClient;
 
     // In the setUp
-    public function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        $this->test_client_id = readline('Enter a client id: ');
-        $this->test_client_secret = readline('Enter a client secret: ');
-        $this->token = readline('Enter a token: ');
+        $test_client_id = readline('Enter a client id: ');
+        $test_client_secret = readline('Enter a client secret: ');
+        $token = readline('Enter a token: ');
+
         $client = new ClientWrapper(GuestyClient::BASE_URL);
-        $this->guestyClient = new GuestyClient(
-            $this->test_client_id,
-            $this->test_client_secret,
+        self::$guestyClient = new GuestyClient(
+            $test_client_id,
+            $test_client_secret,
             $client,
-            $this->token
+            $token
         );
+        echo self::$guestyClient->getToken();
     }
 
     public function testGuestyRequests()
     {
         //guest count
-        $res = $this->guestyClient->getGuestCount();
+        $res = self::$guestyClient->getGuestCount();
         $this->assertEquals(gettype($res), 'integer');
-
         //guest list
-        $res = $this->guestyClient->getGuests(5,5);
+        $res = self::$guestyClient->getGuests(5,5);
         $this->assertEquals(sizeof($res), 5);
-
+        if (sizeof($res) === 5) {
+            $guestId = $res[0]['_id'];
+        }
         //get guest
-        $res = $this->guestyClient->getGuest('5c4465ea7b6c1f001e1a46e8');
-        $this->assertEquals('5c4465ea7b6c1f001e1a46e8', $res['_id']);
+        $res = self::$guestyClient->getGuest($guestId ?? null);
+        $this->assertEquals($guestId, $res['_id']);
 
         //listings count
-        $res = $this->guestyClient->getListingCount();
+        $res = self::$guestyClient->getListingCount();
         $this->assertEquals(gettype($res), 'integer');
+        //get listings
+        $res = self::$guestyClient->getListings(0,5);
+        $this->assertEquals(sizeof($res), 5);
+        if (sizeof($res) === 5) {
+            $listingId = $res[0]['_id'];
+        }
+        //get listing
+        $res = self::$guestyClient->getListing($listingId ?? null);
+        $this->assertEquals($listingId, $res['_id']);
 
         //get reservation
-        $res = $this->guestyClient->retrieveReservation('5c436b5ab1d05b00335bd517');
+        $res = self::$guestyClient->retrieveReservation('5c436b5ab1d05b00335bd517');
         $this->assertEquals('5c436b5ab1d05b00335bd517', $res['_id']);
-
-        //get listing
-        $res = $this->guestyClient->getListing('5c030ea850449600408b17aa');
-        $this->assertEquals('5c030ea850449600408b17aa', $res['_id']);
-
-        //get listings
-        $res = $this->guestyClient->getListings(0,5);
-        $this->assertEquals(sizeof($res), 5);
-
     }
 }

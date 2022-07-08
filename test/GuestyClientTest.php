@@ -234,7 +234,6 @@ class GuestyClientTest extends TestCase
                     "scope" => "open-api"
                 ],
                 [
-                    24787
                 ]
             );
         $client->method('getLastResponseCode')
@@ -287,7 +286,6 @@ class GuestyClientTest extends TestCase
                     "scope" => "open-api"
                 ],
                 [
-                    4125
                 ]
             );
         $client->method('getLastResponseCode')
