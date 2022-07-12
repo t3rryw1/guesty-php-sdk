@@ -19,15 +19,16 @@ class GuestyClientRequestTest extends TestCase
         $token = readline('Enter a token(Optional): ');
 
         $client = new ClientWrapper(GuestyClient::BASE_URL);
-        self::$guestyClient = new GuestyClient(
+        $guestyClient = new GuestyClient(
             $test_client_id,
             $test_client_secret,
             $client,
             $token
         );
-        self::$guestyClient->setTokenUpdateCallback(function ($token) {
+        $guestyClient->setTokenUpdateCallback(function ($token) {
             echo $token;
         });
+        self::$guestyClient = $guestyClient;
     }
 
     public function testGuestyEndPoints()
