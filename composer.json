@@ -2,7 +2,7 @@
     "name": "cozystay/guesty-php-sdk",
     "description": "sdk for the new guesty api",
     "type": "library",
-    "license": "APL 2.0",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Terry Wang",
