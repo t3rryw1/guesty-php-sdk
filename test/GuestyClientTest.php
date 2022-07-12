@@ -205,7 +205,7 @@ class GuestyClientTest extends TestCase
     {
         /** @var ClientWrapper|MockObject */
         $client = $this->createMock(ClientWrapper::class);
-        $client->expects($this->exactly(1))
+        $client->expects($this->exactly(2))
             ->method('request')
             ->withConsecutive(
                 [
@@ -237,7 +237,7 @@ class GuestyClientTest extends TestCase
                 ]
             );
         $client->method('getLastResponseCode')
-            ->willReturnOnConsecutiveCalls(404);
+            ->willReturnOnConsecutiveCalls(200, 404);
         //return 404 saying resource not found
 
         $guestyClient = new GuestyClient(
@@ -257,7 +257,7 @@ class GuestyClientTest extends TestCase
         $client = $this->createMock(ClientWrapper::class);
         /** @var ClientWrapper|MockObject */
         $client = $this->createMock(ClientWrapper::class);
-        $client->expects($this->exactly(1))
+        $client->expects($this->exactly(2))
             ->method('request')
             ->withConsecutive(
                 [
@@ -289,7 +289,7 @@ class GuestyClientTest extends TestCase
                 ]
             );
         $client->method('getLastResponseCode')
-            ->willReturnOnConsecutiveCalls(400);
+            ->willReturnOnConsecutiveCalls(200, 400);
         //return 400 saying resource not found            //return 400 saying bad request
 
         $guestyClient = new GuestyClient(

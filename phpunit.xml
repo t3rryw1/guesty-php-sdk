@@ -13,8 +13,9 @@
 >
 
     <testsuites>
-        <testsuite name="Guesty SDK Test Suite">
+        <testsuite name="GuestyUnitTests">
             <directory>test</directory>
+            <exclude>test/GuestyClientRequestTest.php</exclude>
         </testsuite>
     </testsuites>
 
