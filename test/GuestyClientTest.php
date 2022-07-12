@@ -19,8 +19,8 @@ class GuestyClientTest extends TestCase
         $client->expects($this->once())
             ->method('request')
             ->with(
-                $this->equalTo(['POST','/oauth2/token']),
-                $this->equalTo(['accept: application/json']),
+                $this->equalTo(['POST', '/oauth2/token']),
+                $this->equalTo(['Accept: application/json']),
                 $this->equalTo([
                     'grant_type' => 'client_credentials',
                     'scope' => 'open-api',
@@ -29,19 +29,19 @@ class GuestyClientTest extends TestCase
                 ]),
             )
             ->willReturn([
-                "token_type"=>"Bearer",
-                "expires_in"=> 86400,
-                "access_token"=>"new_created_token",
-                "scope"=>"open-api"
+                "token_type" => "Bearer",
+                "expires_in" => 86400,
+                "access_token" => "new_created_token",
+                "scope" => "open-api"
             ]);
         $guestyClient = new GuestyClient(
             "test_client_id",
             "test_client_secret",
             $client
         );
-        [$token,$expires] = $guestyClient->fetchNewToken();
-        $this->assertEquals($token,'new_created_token');
-        $this->assertEquals($expires,'86400');
+        [$token, $expires] = $guestyClient->fetchNewToken();
+        $this->assertEquals($token, 'new_created_token');
+        $this->assertEquals($expires, '86400');
     }
 
     public function testRequestResourceNormalWorkflow()
@@ -51,16 +51,16 @@ class GuestyClientTest extends TestCase
         $client->expects($this->once())
             ->method('request')
             ->with(
-                $this->equalTo(['GET','/v1/guests']),
+                $this->equalTo(['GET', '/v1/guests']),
                 $this->equalTo([
                     'Authorization: Bearer token_in_effective',
-                    'accept: application/json'
+                    'Accept: application/json'
                 ]),
                 $this->equalTo(['fields' => '_id'])
             )
             ->willReturn([
-                "count"=>1,
-                "results"=>[
+                "count" => 1,
+                "results" => [
                     ["_id" => "58243555fb61770400aede31",]
                 ]
                 //sample guests data
@@ -73,12 +73,12 @@ class GuestyClientTest extends TestCase
             $client,
             'token_in_effective'
         );
-            //return expired result at first
-            //then return token at second request
-            // then third request with updated token and return correct result
+        //return expired result at first
+        //then return token at second request
+        // then third request with updated token and return correct result
         $guestCount = $guestyClient->getGuestCount();
         // verify result
-        $this->assertEquals($guestCount,1);
+        $this->assertEquals($guestCount, 1);
 
     }
 
@@ -87,19 +87,19 @@ class GuestyClientTest extends TestCase
         /** @var ClientWrapper|MockObject */
         $client = $this->createMock(ClientWrapper::class);
         $client->expects($this->exactly(3))
-        ->method('request')
+            ->method('request')
             ->withConsecutive(
                 [
-                    $this->equalTo(['GET','/v1/guests']),
+                    $this->equalTo(['GET', '/v1/guests']),
                     $this->equalTo([
                         'Authorization: Bearer token_expired',
-                        'accept: application/json'
+                        'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
                 ],
                 [
-                    $this->equalTo(['POST','/oauth2/token']),
-                    $this->equalTo(['accept: application/json']),
+                    $this->equalTo(['POST', '/oauth2/token']),
+                    $this->equalTo(['Accept: application/json']),
                     $this->equalTo([
                         'grant_type' => 'client_credentials',
                         'scope' => 'open-api',
@@ -108,31 +108,31 @@ class GuestyClientTest extends TestCase
                     ])
                 ],
                 [
-                    $this->equalTo(['GET','/v1/guests']),
+                    $this->equalTo(['GET', '/v1/guests']),
                     $this->equalTo([
                         'Authorization: Bearer new_created_token',
-                        'accept: application/json'
+                        'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
                 ])
-            ->willReturnOnConsecutiveCalls(    
+            ->willReturnOnConsecutiveCalls(
                 [],
                 [
-                    "token_type"=>"Bearer",
-                    "expires_in"=> 86400,
-                    "access_token"=>"new_created_token",
-                    "scope"=>"open-api"
+                    "token_type" => "Bearer",
+                    "expires_in" => 86400,
+                    "access_token" => "new_created_token",
+                    "scope" => "open-api"
                 ],
                 [
-                    "count"=>1,
-                    "results"=>[
+                    "count" => 1,
+                    "results" => [
                         ["_id" => "58243555fb61770400aede31",]
                     ]
                     //sample guests data
                 ]
             );
         $client->method('getLastResponseCode')
-            ->willReturnOnConsecutiveCalls(401,200,200);
+            ->willReturnOnConsecutiveCalls(401, 200, 200);
 
         $guestyClient = new GuestyClient(
             "test_client_id",
@@ -140,12 +140,12 @@ class GuestyClientTest extends TestCase
             $client,
             'token_expired'
         );
-        $guestyClient->setTokenUpdateCallback(function($token){
-            $this->assertEquals($token,'new_created_token');
+        $guestyClient->setTokenUpdateCallback(function ($token) {
+            $this->assertEquals($token, 'new_created_token');
         });
         $guestCount = $guestyClient->getGuestCount();
         //verify result correct
-        $this->assertEquals($guestCount,1);
+        $this->assertEquals($guestCount, 1);
     }
 
     public function testRequestResourceWithNoToken()
@@ -153,11 +153,11 @@ class GuestyClientTest extends TestCase
         /** @var ClientWrapper|MockObject */
         $client = $this->createMock(ClientWrapper::class);
         $client->expects($this->exactly(2))
-        ->method('request')
+            ->method('request')
             ->withConsecutive(
                 [
-                    $this->equalTo(['POST','/oauth2/token']),
-                    $this->equalTo(['accept: application/json']),
+                    $this->equalTo(['POST', '/oauth2/token']),
+                    $this->equalTo(['Accept: application/json']),
                     $this->equalTo([
                         'grant_type' => 'client_credentials',
                         'scope' => 'open-api',
@@ -166,23 +166,23 @@ class GuestyClientTest extends TestCase
                     ])
                 ],
                 [
-                    $this->equalTo(['GET','/v1/guests']),
+                    $this->equalTo(['GET', '/v1/guests']),
                     $this->equalTo([
                         'Authorization: Bearer new_created_token',
-                        'accept: application/json'
+                        'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
                 ])
-            ->willReturnOnConsecutiveCalls(    
+            ->willReturnOnConsecutiveCalls(
                 [
-                    "token_type"=>"Bearer",
-                    "expires_in"=> 86400,
-                    "access_token"=>"new_created_token",
-                    "scope"=>"open-api"
+                    "token_type" => "Bearer",
+                    "expires_in" => 86400,
+                    "access_token" => "new_created_token",
+                    "scope" => "open-api"
                 ],
                 [
-                    "count"=>1,
-                    "results"=>[
+                    "count" => 1,
+                    "results" => [
                         ["_id" => "58243555fb61770400aede31",]
                     ]
                     //sample guests data
@@ -198,7 +198,7 @@ class GuestyClientTest extends TestCase
         );
         $guestCount = $guestyClient->getGuestCount();
         // verify result
-        $this->assertEquals($guestCount,1);
+        $this->assertEquals($guestCount, 1);
     }
 
     public function testRequestNotExistResource()
@@ -206,11 +206,11 @@ class GuestyClientTest extends TestCase
         /** @var ClientWrapper|MockObject */
         $client = $this->createMock(ClientWrapper::class);
         $client->expects($this->exactly(2))
-        ->method('request')
+            ->method('request')
             ->withConsecutive(
                 [
-                    $this->equalTo(['POST','/oauth2/token']),
-                    $this->equalTo(['accept: application/json']),
+                    $this->equalTo(['POST', '/oauth2/token']),
+                    $this->equalTo(['Accept: application/json']),
                     $this->equalTo([
                         'grant_type' => 'client_credentials',
                         'scope' => 'open-api',
@@ -219,34 +219,33 @@ class GuestyClientTest extends TestCase
                     ])
                 ],
                 [
-                    $this->equalTo(['GET','/v1/guests']),
+                    $this->equalTo(['GET', '/v1/guests']),
                     $this->equalTo([
                         'Authorization: Bearer new_created_token',
-                        'accept: application/json'
+                        'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
                 ])
-            ->willReturnOnConsecutiveCalls(    
+            ->willReturnOnConsecutiveCalls(
                 [
-                    "token_type"=>"Bearer",
-                    "expires_in"=> 86400,
-                    "access_token"=>"new_created_token",
-                    "scope"=>"open-api"
+                    "token_type" => "Bearer",
+                    "expires_in" => 86400,
+                    "access_token" => "new_created_token",
+                    "scope" => "open-api"
                 ],
                 [
-                    //sample guests data
                 ]
             );
-            $client->method('getLastResponseCode')
-                ->willReturnOnConsecutiveCalls(404);
-            //return 404 saying resource not found
+        $client->method('getLastResponseCode')
+            ->willReturnOnConsecutiveCalls(200, 404);
+        //return 404 saying resource not found
 
         $guestyClient = new GuestyClient(
             "test_client_id",
             "test_client_secret",
             $client
         );
-        
+
         $this->expectException(NotFoundException::class);
         $guestyClient->getGuestCount();
         // expect exception
@@ -259,11 +258,11 @@ class GuestyClientTest extends TestCase
         /** @var ClientWrapper|MockObject */
         $client = $this->createMock(ClientWrapper::class);
         $client->expects($this->exactly(2))
-        ->method('request')
+            ->method('request')
             ->withConsecutive(
                 [
-                    $this->equalTo(['POST','/oauth2/token']),
-                    $this->equalTo(['accept: application/json']),
+                    $this->equalTo(['POST', '/oauth2/token']),
+                    $this->equalTo(['Accept: application/json']),
                     $this->equalTo([
                         'grant_type' => 'client_credentials',
                         'scope' => 'open-api',
@@ -272,27 +271,26 @@ class GuestyClientTest extends TestCase
                     ])
                 ],
                 [
-                    $this->equalTo(['GET','/v1/guests']),
+                    $this->equalTo(['GET', '/v1/guests']),
                     $this->equalTo([
                         'Authorization: Bearer new_created_token',
-                        'accept: application/json'
+                        'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
                 ])
-            ->willReturnOnConsecutiveCalls(    
+            ->willReturnOnConsecutiveCalls(
                 [
-                    "token_type"=>"Bearer",
-                    "expires_in"=> 86400,
-                    "access_token"=>"new_created_token",
-                    "scope"=>"open-api"
+                    "token_type" => "Bearer",
+                    "expires_in" => 86400,
+                    "access_token" => "new_created_token",
+                    "scope" => "open-api"
                 ],
                 [
-                    //sample guests data
                 ]
             );
-            $client->method('getLastResponseCode')
-                ->willReturnOnConsecutiveCalls(400);
-            //return 400 saying resource not found            //return 400 saying bad request
+        $client->method('getLastResponseCode')
+            ->willReturnOnConsecutiveCalls(200, 400);
+        //return 400 saying resource not found            //return 400 saying bad request
 
         $guestyClient = new GuestyClient(
             "test_client_id",
