@@ -1,74 +1,46 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: terry
+ * Date: 2019-04-10
+ * Time: 09:45
+ */
 
-namespace Cozy\Lib\Guesty;
+namespace Laura\Lib\External\Guesty;
 
-class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
+use Cozy\Lib\Guesty\ClientWrapper;
+
+class GuestyClientV1 
 {
-    public const BASE_URL = "https://open-api.guesty.com";
+    public const BASE_URL = "https://api.guesty.com/api/v2/";
 
-    public const AUTH_TOKEN_URL = ["POST", "/oauth2/token"];
-    public const NEW_RESERVATION_URL = ["POST", "/v1/reservations"];
-    public const RETRIEVE_RESERVATION = ["GET", "/v1/reservations/{reservationId}"];
-    public const RETRIEVE_RESERVATION_LIST = ["GET", "/v1/reservations"];
-    public const GET_LISTING_URL = ["GET", "/v1/listings/{listingId}"];
-    public const BATCH_LISTING_CALENDARS = ["GET", "/v1/availability-pricing/api/calendar/listings"];
-    public const UPDATE_LISTING_CALENDARS = ["PUT", "/v1/availability-pricing/api/calendar/listings/{listingId}"];
-    public const UPDATE_MULTIPLE_LISTING_CALENDARS = ["PUT", "/v1/availability-pricing/api/calendar/listings"];
-    public const LISTINGS = ["GET", "/v1/listings"];
-    public const UPDATE_LISTING_INFO = ["PUT", "/v1/listings/{listingId}"];
-    public const GUESTS = ["GET", "/v1/guests"];
-    public const GUEST_DETAIL = ["GET", "/v1/guests/{guestId}"];
-    public const CONVERSATIONS = ["GET", "/v1/communication/conversations"];
-    public const CONVERSATION_DETAIL = ["GET", "/v1/communication/conversations/{conversationId}/posts"];
-    public const NEW_MESSAGE = ["POST", "/v1/communication/conversations/{conversationId}/send-message"];
-    public const UPDATE_CONVERSATION = ["PUT", "/v1/owner-inbox/conversations/{conversationId}"];
-    public const UPDATE_RESERVATION = ["PUT", "/v1/reservations/{reservationId}"];
+    public const NEW_RESERVATION_URL = ["POST", "reservations"];
+    public const RETRIEVE_RESERVATION = ["GET", "/reservations/{reservationId}"];
+    public const GET_LISTING_URL = ["GET", "listings/{listingId}"];
+    public const BATCH_LISTING_CALENDARS = ["GET", "availability-pricing/api/calendar/listings"];
+    public const UPDATE_LISTING_CALENDARS = ["PUT", "availability-pricing/api/calendar/listings/{listingId}"];
+    public const UPDATE_MULTIPLE_LISTING_CALENDARS = ["PUT", "availability-pricing/api/calendar/listings"];
+    public const LISTINGS = ["GET", "listings"];
+    public const UPDATE_LISTING_INFO = ["PUT", "listings/{listingId}"];
+    public const GUESTS = ["GET", "guests"];
+    public const GUEST_DETAIL = ["GET", "guests/{guestId}"];
+    public const CONVERSATIONS = ["GET", "communication/conversations"];
+    public const CONVERSATION_DETAIL = ["GET", "/communication/conversations/{conversationId}/posts"];
+    public const NEW_MESSAGE = ["POST", "/communication/conversations/{conversationId}/send-message"];
+    public const UPDATE_CONVERSATION = ["PUT", "owner-inbox/conversations/{conversationId}"];
+    public const UPDATE_RESERVATION = ["PUT", "/reservations/{reservationId}"];
 
-    protected $token;
-    private $clientSecret;
-    private $clientId;
+    private $token;
 
-    public function __construct(
-        $clientId,
-        $clientSecret,
-        $client,
-        $token = null,
-        $expiresAt = null)
+    private $client;
+
+    public function __construct($token)
     {
-        parent::__construct($client, $token, $expiresAt);
-        $this->clientId = $clientId;
-        $this->clientSecret = $clientSecret;
-    }
-
-    function fetchNewToken(): array
-    {
-        $authHeader = [
-            "Accept: application/json"
-        ];
-        $authData = [
-            'grant_type' => 'client_credentials',
-            'scope' => 'open-api',
-            'client_secret' => $this->clientSecret,
-            'client_id' => $this->clientId
-        ];
-        $res = $this->client->request(
-            self::AUTH_TOKEN_URL,
-            $authHeader,
-            $authData,
-            false
+        $this->client = new ClientWrapper(self::BASE_URL);
+        $this->token = array(
+            "Authorization: Basic $token",
+            "Content-Type: application/json"
         );
-        $responseCode = $this->client->getLastResponseCode();
-        $this->throwException($responseCode);
-        return [
-            $res['access_token'],
-            $res['expires_in']
-        ];
-        // we need to parse result here and return token.
-    }
-
-    function isRequestTokenExpired($response): bool
-    {
-        return $this->client->getLastResponseCode() === 401;
     }
 
     /**
@@ -78,57 +50,46 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
      */
     public function newReservation($data)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::NEW_RESERVATION_URL,
-            $data,
+            $this->token,
+            $data
         );
     }
 
     public function retrieveReservation($reservationId)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::RETRIEVE_RESERVATION,
+            $this->token,
             compact("reservationId")
         );
     }
 
-    public function retrieveReservationList($skip, $limit)
-    {
-        if ($skip === 0) {
-            $result = $this->optimisticRequestWithToken(
-                self::RETRIEVE_RESERVATION_LIST,
-                ["limit" => $limit],
-            );
-        } else {
-            $result = $this->optimisticRequestWithToken(
-                self::RETRIEVE_RESERVATION_LIST,
-                ["limit" => $limit, "skip" => $skip],
-            );
-        }
-        return $result['results'];
-    }
-
     public function updateReservation($data)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::UPDATE_RESERVATION,
+            $this->token,
             $data
         );
     }
 
     public function updateListing($data)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::UPDATE_LISTING_INFO,
+            $this->token,
             $data
         );
     }
 
     public function getListing($listingId)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::GET_LISTING_URL,
-            compact("listingId"),
+            $this->token,
+            compact("listingId")
         );
     }
 
@@ -150,13 +111,13 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         $note,
         $price,
         $minNights
-    )
-    {
+    ) {
         $price = intval($price);
         $data = array_filter(compact('listingId', 'startDate', 'endDate', 'status', 'price', 'minNights'));
         isset($note) && $data['note'] = $note;
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::UPDATE_LISTING_CALENDARS,
+            $this->token,
             $data
         );
     }
@@ -167,8 +128,9 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
      */
     public function updateMultipleListingCalendar($data)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::UPDATE_MULTIPLE_LISTING_CALENDARS,
+            $this->token,
             $data
         );
     }
@@ -182,21 +144,23 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
      */
     public function getMultipleListingCalendars($guestyIds, $startDate, $endDate)
     {
-        $res = $this->optimisticRequestWithToken(
+        $res= $this->client->request(
             self::BATCH_LISTING_CALENDARS,
+            $this->token,
             [
                 "listingIds" => implode(",", $guestyIds),
                 "startDate" => $startDate,
                 "endDate" => $endDate
-            ],
+            ]
         );
         return $res['data']['days'];
     }
 
     public function getListingCount()
     {
-        $res = $this->optimisticRequestWithToken(
+        $res = $this->client->request(
             self::LISTINGS,
+            $this->token,
             [
                 "fields" => "_id",
                 "limit" => 1
@@ -211,45 +175,50 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         if ($skip === 0) {
             if ($ids != null) {
                 $idStr = implode(",", $ids);
-                $result = $this->optimisticRequestWithToken(
+                $result = $this->client->request(
                     self::LISTINGS,
+                    $this->token,
                     [
                         "ids" => $idStr,
                         "limit" => $limit
                     ],
                 );
             } else {
-                $result = $this->optimisticRequestWithToken(
+                $result = $this->client->request(
                     self::LISTINGS,
-                    ["limit" => $limit]
+                    $this->token,
+                    ["limit" => $limit],
                 );
             }
         } else {
             if ($ids != null) {
                 $idStr = implode(",", $ids);
 
-                $result = $this->optimisticRequestWithToken(
+                $result = $this->client->request(
                     self::LISTINGS,
+                    $this->token,
                     [
                         "ids" => $idStr,
                         "limit" => $limit,
                         "skip" => $skip],
                 );
             } else {
-                $result = $this->optimisticRequestWithToken(
+                $result = $this->client->request(
                     self::LISTINGS,
+                    $this->token,
                     ["limit" => $limit, "skip" => $skip],
                 );
             }
         }
 
-        return $result['results'];
+        return $result;
     }
 
     public function getGuestCount()
     {
-        $res = $this->optimisticRequestWithToken(
+        $res = $this->client->request(
             self::GUESTS,
+            $this->token,
             [
                 "fields" => "_id",
             ]
@@ -261,42 +230,47 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public function getGuests(int $skip, $limit)
     {
         if ($skip === 0) {
-            $result = $this->optimisticRequestWithToken(
+            $result = $this->client->request(
                 self::GUESTS,
+                $this->token,
                 ["limit" => $limit],
             );
         } else {
-            $result = $this->optimisticRequestWithToken(
+            $result = $this->client->request(
                 self::GUESTS,
+                $this->token,
                 ["limit" => $limit, "skip" => $skip],
             );
         }
 
-        return $result['results'];
+        return $result;
     }
 
     public function getGuest($guestId)
     {
-        return $this->optimisticRequestWithToken(
+        $result = $this->client->request(
             self::GUEST_DETAIL,
+            $this->token,
             compact('guestId')
         );
+
+        return $result;
     }
 
     /**
      *
-     * @param $cursor : cursor, for fetching data after the cursor
-     * @param $limit : size of returning list
-     * @param $sortParam : the field to sort by
-     * @param $dataParams : the fields to return
+     * @param $cursor: cursor, for fetching data after the cursor
+     * @param $limit: size of returning list
+     * @param $sortParam: the field to sort by
+     * @param $dataParams: the fields to return
      * @return mixed|null
      */
     public function getConversations($cursorAfter, $limit, $sort, $fields)
     {
-        $result = $this->optimisticRequestWithToken(
+        $result = $this->client->request(
             self::CONVERSATIONS,
+            $this->token,
             array_filter(compact("limit", "sort", "cursorAfter", "fields")),
-            'data'
         );
 
         return $result['data'];
@@ -311,8 +285,9 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
      */
     public function getConversationDetail($conversationId, $cursorAfter, $limit, $sort)
     {
-        $result = $this->optimisticRequestWithToken(
+        $result = $this->client->request(
             self::CONVERSATION_DETAIL,
+            $this->token,
             array_filter(compact('conversationId', 'cursorAfter', 'limit', 'sort'))
         );
 
@@ -325,8 +300,9 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
      */
     public function newMessage($data)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::NEW_MESSAGE,
+            $this->token,
             $data
         );
     }
@@ -337,8 +313,9 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
      */
     public function updateConversation($data)
     {
-        return $this->optimisticRequestWithToken(
+        return $this->client->request(
             self::UPDATE_CONVERSATION,
+            $this->token,
             $data
         );
     }
