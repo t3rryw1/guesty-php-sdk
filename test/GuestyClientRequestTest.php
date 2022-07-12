@@ -16,7 +16,7 @@ class GuestyClientRequestTest extends TestCase
     {
         $test_client_id = readline('Enter a client id: ');
         $test_client_secret = readline('Enter a client secret: ');
-        $token = readline('Enter a token: ');
+        $token = readline('Enter a token(Optional): ');
 
         $client = new ClientWrapper(GuestyClient::BASE_URL);
         self::$guestyClient = new GuestyClient(

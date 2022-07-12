@@ -17,8 +17,10 @@
             <directory>test</directory>
             <exclude>test/GuestyClientRequestTest.php</exclude>
         </testsuite>
+        <testsuite name="GuestyApiTest">
+            <directory>test</directory>
+        </testsuite>
     </testsuites>
-
 
 
 </phpunit>
