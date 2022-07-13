@@ -50,7 +50,7 @@ class ClientWrapper
         }
         //logger logic
         if($this->logger){
-            $this->logger->debug("URL: $template",['method'=>$urlArray[0],'data'=>$data]);
+            $this->logger->debug("Request - URL: $template",['method'=>$urlArray[0],'data'=>$data]);
         }
 
         $requestDryRun = $this->dryRun && $dryRun;
@@ -103,6 +103,10 @@ class ClientWrapper
         }
 
         $data = json_decode($response, true);
+
+        if($this->logger){
+            $this->logger->debug("Response - ",['method'=>$urlArray[0],'data'=>$data]);
+        }
 
         if (is_null($data)) {
             $data = $response;

@@ -17,8 +17,10 @@ class GuestyClientRequestTest extends TestCase
         $test_client_id = readline('Enter a client id: ');
         $test_client_secret = readline('Enter a client secret: ');
         $token = readline('Enter a token(Optional): ');
-
-        $client = new ClientWrapper(GuestyClient::BASE_URL);
+        $logger = new \Monolog\Logger("guesty");
+        $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
+        
+        $client = new ClientWrapper(GuestyClient::BASE_URL,true,$logger);
         $guestyClient = new GuestyClient(
             $test_client_id,
             $test_client_secret,
