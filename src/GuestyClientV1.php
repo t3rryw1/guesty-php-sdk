@@ -32,11 +32,12 @@ class GuestyClientV1
 
     private $token;
 
+    /** @var ClientWrapper */
     private $client;
 
-    public function __construct($token)
+    public function __construct($token, $client)
     {
-        $this->client = new ClientWrapper(self::BASE_URL);
+        $this->client = $client;
         $this->token = array(
             "Authorization: Basic $token",
             "Content-Type: application/json"

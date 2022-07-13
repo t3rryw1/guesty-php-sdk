@@ -3,6 +3,7 @@
 namespace Cozy\Lib\Guesty;
 
 use Exceptions\Http\Client\MethodNotAllowedException;
+use Monolog\Logger;
 
 class ClientWrapper
 {
@@ -10,12 +11,19 @@ class ClientWrapper
      * @var HttpClient
      */
     private $client;
+    /** @var Logger */
     private $logger;
+    /**@var bool */
+    private $dryRun;
 
-    public function __construct($baseUrl, $logger=null)
+    public function __construct(
+        string $baseUrl,
+        bool $dryRun = true,
+        Logger $logger = null)
     {
         $this->client = new HttpClient($baseUrl);
         $this->logger = $logger;
+        $this->dryRun = $dryRun;
     }
 
     /**
@@ -25,7 +33,12 @@ class ClientWrapper
      * @return array|mixed
      * @throws LauraException
      */
-    public function request($urlArray, $header, $data, $jsonEncode = true)
+    public function request(
+        $urlArray,
+        $header,
+        $data,
+        $jsonEncode = true,
+        $dryRun=true)
     {
         extract($data);
         $template = $urlArray[1];
@@ -35,10 +48,19 @@ class ClientWrapper
                 unset($data[$varname]);
             }
         }
+        //logger logic
+        if($this->logger){
+            $this->logger->debug("Request - URL: $template",['method'=>$urlArray[0],'data'=>$data]);
+        }
+
+        $requestDryRun = $this->dryRun && $dryRun;
 
         switch (strtolower($urlArray[0])) {
 
             case "post":
+                if($requestDryRun){
+                    return null;
+                }
                 if ($jsonEncode) {
                     $data = json_encode($data);
                 }
@@ -53,12 +75,18 @@ class ClientWrapper
                 $response = $this->client->get($template . $query, $header);
                 break;
             case "put":
+                if($requestDryRun){
+                    return null;
+                }
                 if ($jsonEncode) {
                     $data = json_encode($data);
                 }
                 $response = $this->client->put($template, $header, $data);
                 break;
             case "delete":
+                if($requestDryRun){
+                    return null;
+                }
                 if ($data) {
                     $query = '?' . http_build_query($data);
                 } else {
@@ -75,6 +103,10 @@ class ClientWrapper
         }
 
         $data = json_decode($response, true);
+
+        if($this->logger){
+            $this->logger->debug("Response - ",['method'=>$urlArray[0],'data'=>$data]);
+        }
 
         if (is_null($data)) {
             $data = $response;

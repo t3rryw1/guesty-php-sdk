@@ -55,7 +55,8 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             self::AUTH_TOKEN_URL,
             $authHeader,
             $authData,
-            false
+            false,
+            false,
         );
         $responseCode = $this->client->getLastResponseCode();
         $this->throwException($responseCode);
