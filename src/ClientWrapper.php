@@ -3,6 +3,7 @@
 namespace Cozy\Lib\Guesty;
 
 use Exceptions\Http\Client\MethodNotAllowedException;
+use Monolog\Logger;
 
 class ClientWrapper
 {
@@ -10,13 +11,15 @@ class ClientWrapper
      * @var HttpClient
      */
     private $client;
+    /** @var Logger */
     private $logger;
+    /**@var bool */
     private $dryRun;
 
     public function __construct(
-        $baseUrl,
-        $dryRun=true,
-        $logger=null)
+        string $baseUrl,
+        bool $dryRun = true,
+        Logger $logger = null)
     {
         $this->client = new HttpClient($baseUrl);
         $this->logger = $logger;
@@ -30,7 +33,12 @@ class ClientWrapper
      * @return array|mixed
      * @throws LauraException
      */
-    public function request($urlArray, $header, $data, $jsonEncode = true,$dryRun=true)
+    public function request(
+        $urlArray,
+        $header,
+        $data,
+        $jsonEncode = true,
+        $dryRun=true)
     {
         extract($data);
         $template = $urlArray[1];
@@ -40,7 +48,10 @@ class ClientWrapper
                 unset($data[$varname]);
             }
         }
-        //TODO: add logger logic
+        //logger logic
+        if($this->logger){
+            $this->logger->debug("URL: $template",['method'=>$urlArray[0],'data'=>$data]);
+        }
 
         $requestDryRun = $this->dryRun && $dryRun;
 
