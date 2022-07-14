@@ -6,7 +6,7 @@
  * Time: 09:45
  */
 
-namespace Laura\Lib\External\Guesty;
+namespace Cozy\Lib\Guesty;
 
 use Cozy\Lib\Guesty\ClientWrapper;
 
