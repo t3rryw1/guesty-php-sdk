@@ -21,15 +21,15 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
     protected $token;
     protected $expiredAt;
 
-    function __construct(ClientWrapper $client, string $token = null, string $expiredAt = null)
+    public function __construct(ClientWrapper $client, string $token = null, string $expiredAt = null)
     {
         $this->client = $client;
         $this->token = $token;
-        //TODO: handle expires logic 
+        //TODO: handle expires logic
         $this->expiredAt = $expiredAt;
     }
 
-    function setTokenUpdateCallback(callable $callback)
+    public function setTokenUpdateCallback(callable $callback)
     {
         $this->tokenUpdateCallback = $callback;
         return $this;
@@ -53,7 +53,8 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
         $res = $this->client->request(
             $urlArray,
             $this->buildHeader(),
-            $params);
+            $params
+        );
         $responseCode = $this->client->getLastResponseCode();
         $this->throwException($responseCode);
         return $res;
@@ -87,7 +88,7 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
         }
     }
 
-    function optimisticRequestWithToken($urlArray, $params): array
+    public function optimisticRequestWithToken($urlArray, $params): array
     {
         if (!$this->token) {
             return $this->refetchTokenAndRequest($urlArray, $params);
@@ -95,7 +96,8 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
         $response = $this->client->request(
             $urlArray,
             $this->buildHeader(),
-            $params);
+            $params
+        );
 
         $responseCode = $this->client->getLastResponseCode();
         if ($responseCode >= 400) {

@@ -19,7 +19,8 @@ class ClientWrapper
     public function __construct(
         string $baseUrl,
         bool $dryRun = true,
-        Logger $logger = null)
+        Logger $logger = null
+    )
     {
         $this->client = new HttpClient($baseUrl);
         $this->logger = $logger;
@@ -38,7 +39,8 @@ class ClientWrapper
         $header,
         $data,
         $jsonEncode = true,
-        $dryRun=true)
+        $dryRun=true
+    )
     {
         extract($data);
         $template = $urlArray[1];
@@ -49,8 +51,8 @@ class ClientWrapper
             }
         }
         //logger logic
-        if($this->logger){
-            $this->logger->debug("Request - URL: $template",['method'=>$urlArray[0],'data'=>$data]);
+        if ($this->logger) {
+            $this->logger->debug("Request - URL: $template", ['method'=>$urlArray[0],'data'=>$data]);
         }
 
         $requestDryRun = $this->dryRun && $dryRun;
@@ -58,7 +60,7 @@ class ClientWrapper
         switch (strtolower($urlArray[0])) {
 
             case "post":
-                if($requestDryRun){
+                if ($requestDryRun) {
                     return null;
                 }
                 if ($jsonEncode) {
@@ -75,7 +77,7 @@ class ClientWrapper
                 $response = $this->client->get($template . $query, $header);
                 break;
             case "put":
-                if($requestDryRun){
+                if ($requestDryRun) {
                     return null;
                 }
                 if ($jsonEncode) {
@@ -84,7 +86,7 @@ class ClientWrapper
                 $response = $this->client->put($template, $header, $data);
                 break;
             case "delete":
-                if($requestDryRun){
+                if ($requestDryRun) {
                     return null;
                 }
                 if ($data) {
@@ -104,8 +106,8 @@ class ClientWrapper
 
         $data = json_decode($response, true);
 
-        if($this->logger){
-            $this->logger->debug("Response - ",['method'=>$urlArray[0],'data'=>$data]);
+        if ($this->logger) {
+            $this->logger->debug("Response - ", ['method'=>$urlArray[0],'data'=>$data]);
         }
 
         if (is_null($data)) {
@@ -114,7 +116,8 @@ class ClientWrapper
         return $data;
     }
 
-    public function getLastResponseCode(){
+    public function getLastResponseCode()
+    {
         return $this->client->getResponseCode()??null;
     }
 }

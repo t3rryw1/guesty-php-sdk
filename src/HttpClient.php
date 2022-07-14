@@ -4,18 +4,17 @@ namespace Cozy\Lib\Guesty;
 
 use Exceptions\IO\Network\UnexpectedResponseException;
 
-
 class HttpClient
 {
     private $baseUrl;
     private $responseCode;
 
-    function getResponseCode()
+    public function getResponseCode()
     {
         return $this->responseCode;
     }
 
-    function setResponseCode($code)
+    public function setResponseCode($code)
     {
         $this->responseCode = $code;
     }

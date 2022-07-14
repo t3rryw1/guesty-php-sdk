@@ -33,14 +33,15 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         $clientSecret,
         $client,
         $token = null,
-        $expiresAt = null)
+        $expiresAt = null
+    )
     {
         parent::__construct($client, $token, $expiresAt);
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
     }
 
-    function fetchNewToken(): array
+    public function fetchNewToken(): array
     {
         $authHeader = [
             "Accept: application/json"
@@ -67,7 +68,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         // we need to parse result here and return token.
     }
 
-    function isRequestTokenExpired($response): bool
+    public function isRequestTokenExpired($response): bool
     {
         return $this->client->getLastResponseCode() === 401;
     }
@@ -151,8 +152,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         $note,
         $price,
         $minNights
-    )
-    {
+    ) {
         $price = intval($price);
         $data = array_filter(compact('listingId', 'startDate', 'endDate', 'status', 'price', 'minNights'));
         isset($note) && $data['note'] = $note;

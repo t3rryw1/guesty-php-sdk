@@ -10,7 +10,7 @@ namespace Laura\Lib\External\Guesty;
 
 use Cozy\Lib\Guesty\ClientWrapper;
 
-class GuestyClientV1 
+class GuestyClientV1
 {
     public const BASE_URL = "https://api.guesty.com/api/v2/";
 

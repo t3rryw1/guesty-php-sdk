@@ -1,6 +1,5 @@
 <?php
 
-namespace Laura\Lib\External;
 
 use Cozy\Lib\Guesty\ClientWrapper;
 use Cozy\Lib\Guesty\GuestyClient;
@@ -79,7 +78,6 @@ class GuestyClientTest extends TestCase
         $guestCount = $guestyClient->getGuestCount();
         // verify result
         $this->assertEquals($guestCount, 1);
-
     }
 
     public function testRequestResourceWithExpiredToken()
@@ -114,7 +112,8 @@ class GuestyClientTest extends TestCase
                         'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
-                ])
+                ]
+            )
             ->willReturnOnConsecutiveCalls(
                 [],
                 [
@@ -172,7 +171,8 @@ class GuestyClientTest extends TestCase
                         'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
-                ])
+                ]
+            )
             ->willReturnOnConsecutiveCalls(
                 [
                     "token_type" => "Bearer",
@@ -225,7 +225,8 @@ class GuestyClientTest extends TestCase
                         'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
-                ])
+                ]
+            )
             ->willReturnOnConsecutiveCalls(
                 [
                     "token_type" => "Bearer",
@@ -277,7 +278,8 @@ class GuestyClientTest extends TestCase
                         'Accept: application/json'
                     ]),
                     $this->equalTo(['fields' => '_id'])
-                ])
+                ]
+            )
             ->willReturnOnConsecutiveCalls(
                 [
                     "token_type" => "Bearer",
