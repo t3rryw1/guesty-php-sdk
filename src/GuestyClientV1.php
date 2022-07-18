@@ -182,13 +182,13 @@ class GuestyClientV1
                     [
                         "ids" => $idStr,
                         "limit" => $limit
-                    ],
+                    ]
                 );
             } else {
                 $result = $this->client->request(
                     self::LISTINGS,
                     $this->token,
-                    ["limit" => $limit],
+                    ["limit" => $limit]
                 );
             }
         } else {
@@ -201,13 +201,13 @@ class GuestyClientV1
                     [
                         "ids" => $idStr,
                         "limit" => $limit,
-                        "skip" => $skip],
+                        "skip" => $skip]
                 );
             } else {
                 $result = $this->client->request(
                     self::LISTINGS,
                     $this->token,
-                    ["limit" => $limit, "skip" => $skip],
+                    ["limit" => $limit, "skip" => $skip]
                 );
             }
         }
@@ -234,13 +234,13 @@ class GuestyClientV1
             $result = $this->client->request(
                 self::GUESTS,
                 $this->token,
-                ["limit" => $limit],
+                ["limit" => $limit]
             );
         } else {
             $result = $this->client->request(
                 self::GUESTS,
                 $this->token,
-                ["limit" => $limit, "skip" => $skip],
+                ["limit" => $limit, "skip" => $skip]
             );
         }
 
@@ -271,7 +271,7 @@ class GuestyClientV1
         $result = $this->client->request(
             self::CONVERSATIONS,
             $this->token,
-            array_filter(compact("limit", "sort", "cursorAfter", "fields")),
+            array_filter(compact("limit", "sort", "cursorAfter", "fields"))
         );
 
         return $result['data'];
