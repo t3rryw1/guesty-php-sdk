@@ -1,6 +1,5 @@
 <?php
 
-namespace Laura\Lib\External;
 
 use Cozy\Lib\Guesty\ClientWrapper;
 use Cozy\Lib\Guesty\GuestyClient;
@@ -19,8 +18,8 @@ class GuestyClientRequestTest extends TestCase
         $token = readline('Enter a token(Optional): ');
         $logger = new \Monolog\Logger("guesty");
         $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
-        
-        $client = new ClientWrapper(GuestyClient::BASE_URL,true,$logger);
+
+        $client = new ClientWrapper(GuestyClient::BASE_URL, true, $logger);
         $guestyClient = new GuestyClient(
             $test_client_id,
             $test_client_secret,
