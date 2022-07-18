@@ -57,7 +57,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             $authHeader,
             $authData,
             false,
-            false,
+            false
         );
         $responseCode = $this->client->getLastResponseCode();
         $this->throwException($responseCode);
@@ -82,7 +82,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::NEW_RESERVATION_URL,
-            $data,
+            $data
         );
     }
 
@@ -99,12 +99,12 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         if ($skip === 0) {
             $result = $this->optimisticRequestWithToken(
                 self::RETRIEVE_RESERVATION_LIST,
-                ["limit" => $limit],
+                ["limit" => $limit]
             );
         } else {
             $result = $this->optimisticRequestWithToken(
                 self::RETRIEVE_RESERVATION_LIST,
-                ["limit" => $limit, "skip" => $skip],
+                ["limit" => $limit, "skip" => $skip]
             );
         }
         return $result['results'];
@@ -130,7 +130,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::GET_LISTING_URL,
-            compact("listingId"),
+            compact("listingId")
         );
     }
 
@@ -189,7 +189,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
                 "listingIds" => implode(",", $guestyIds),
                 "startDate" => $startDate,
                 "endDate" => $endDate
-            ],
+            ]
         );
         return $res['data']['days'];
     }
@@ -217,7 +217,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
                     [
                         "ids" => $idStr,
                         "limit" => $limit
-                    ],
+                    ]
                 );
             } else {
                 $result = $this->optimisticRequestWithToken(
@@ -234,12 +234,12 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
                     [
                         "ids" => $idStr,
                         "limit" => $limit,
-                        "skip" => $skip],
+                        "skip" => $skip]
                 );
             } else {
                 $result = $this->optimisticRequestWithToken(
                     self::LISTINGS,
-                    ["limit" => $limit, "skip" => $skip],
+                    ["limit" => $limit, "skip" => $skip]
                 );
             }
         }
@@ -264,12 +264,12 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         if ($skip === 0) {
             $result = $this->optimisticRequestWithToken(
                 self::GUESTS,
-                ["limit" => $limit],
+                ["limit" => $limit]
             );
         } else {
             $result = $this->optimisticRequestWithToken(
                 self::GUESTS,
-                ["limit" => $limit, "skip" => $skip],
+                ["limit" => $limit, "skip" => $skip]
             );
         }
 
