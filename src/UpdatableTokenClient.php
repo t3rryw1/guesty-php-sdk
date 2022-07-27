@@ -39,7 +39,8 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
     {
         return array(
             "Authorization: Bearer {$this->token}",
-            "Accept: application/json"
+            "Accept: application/json",
+            "Content-Type: application/json"
         );
     }
 
