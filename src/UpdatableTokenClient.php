@@ -89,7 +89,7 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
         }
     }
 
-    public function optimisticRequestWithToken($urlArray, $params): array
+    public function optimisticRequestWithToken($urlArray, $params): array|null
     {
         if (!$this->token) {
             return $this->refetchTokenAndRequest($urlArray, $params);
