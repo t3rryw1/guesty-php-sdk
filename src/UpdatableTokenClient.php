@@ -100,6 +100,10 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
             $params
         );
 
+        if ($this->client->isDryRun() && strtolower($urlArray[0]) !=='get') {
+            return null;
+        }
+
         $responseCode = $this->client->getLastResponseCode();
         if ($responseCode >= 400) {
             if ($responseCode === 401) {

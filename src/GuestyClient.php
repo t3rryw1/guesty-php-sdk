@@ -34,8 +34,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         $client,
         $token = null,
         $expiresAt = null
-    )
-    {
+    ) {
         parent::__construct($client, $token, $expiresAt);
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;

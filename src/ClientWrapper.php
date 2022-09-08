@@ -20,11 +20,15 @@ class ClientWrapper
         string $baseUrl,
         bool $dryRun = true,
         Logger $logger = null
-    )
-    {
+    ) {
         $this->client = new HttpClient($baseUrl);
         $this->logger = $logger;
         $this->dryRun = $dryRun;
+    }
+
+    public function isDryRun(): bool
+    {
+        return $this->dryRun;
     }
 
     /**
@@ -40,8 +44,7 @@ class ClientWrapper
         $data,
         $jsonEncode = true,
         $dryRun=true
-    )
-    {
+    ) {
         extract($data);
         $template = $urlArray[1];
         if (preg_match_all("/{(.*?)}/", $urlArray[1], $m)) {
