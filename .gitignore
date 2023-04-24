@@ -52,3 +52,5 @@
 
 *.cache
 .idea
+
+.DS_Store

@@ -10,6 +10,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const NEW_RESERVATION_URL = ["POST", "/v1/reservations"];
     public const RETRIEVE_RESERVATION = ["GET", "/v1/reservations/{reservationId}"];
     public const RETRIEVE_RESERVATION_LIST = ["GET", "/v1/reservations"];
+    public const NEW_LISTING_URL = ["POST", "/v1/listings"];
     public const GET_LISTING_URL = ["GET", "/v1/listings/{listingId}"];
     public const BATCH_LISTING_CALENDARS = ["GET", "/v1/availability-pricing/api/calendar/listings"];
     public const UPDATE_LISTING_CALENDARS = ["PUT", "/v1/availability-pricing/api/calendar/listings/{listingId}"];
@@ -113,6 +114,14 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::UPDATE_RESERVATION,
+            $data
+        );
+    }
+
+    public function newListing($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::NEW_RESERVATION_URL,
             $data
         );
     }

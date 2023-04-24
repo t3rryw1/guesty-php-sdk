@@ -10,10 +10,10 @@
         }
     ],
     "require": {
-        "monolog/monolog": "^2.7",
+        "monolog/monolog": "^3.0",
         "crazycodr/standard-exceptions": "^2.4",
         "php": ">=7.2",
-        "symfony/property-access": "6.1.*"
+        "symfony/property-access": "^6.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"
