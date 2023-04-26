@@ -121,7 +121,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public function newListing($data)
     {
         return $this->optimisticRequestWithToken(
-            self::NEW_RESERVATION_URL,
+            self::NEW_LISTING_URL,
             $data
         );
     }
