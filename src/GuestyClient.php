@@ -26,7 +26,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const NEW_MESSAGE = ["POST", "/v1/communication/conversations/{conversationId}/send-message"];
     public const UPDATE_CONVERSATION = ["PUT", "/v1/owner-inbox/conversations/{conversationId}"];
     public const UPDATE_RESERVATION = ["PUT", "/v1/reservations/{reservationId}"];
-    public const ADD_LISTING_SPACE = ["PUT", "/v1/properties/spaces/unit-type/{unitTypeId}/add"];
+    public const ADD_LISTING_SPACE = ["POST", "/v1/properties/spaces/unit-type/{unitTypeId}/add"];
 
     protected $token;
     private $clientSecret;
