@@ -17,6 +17,8 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const UPDATE_MULTIPLE_LISTING_CALENDARS = ["PUT", "/v1/availability-pricing/api/calendar/listings"];
     public const LISTINGS = ["GET", "/v1/listings"];
     public const UPDATE_LISTING_INFO = ["PUT", "/v1/listings/{listingId}"];
+    public const UPDATE_LISTING_AVAIL_SETTING = ["PUT","/v1/listings/{listingId}/availability-settings"];
+    public const DELETE_LISTING = ["DELETE","/v1/listings/{listingId}"];
     public const GUESTS = ["GET", "/v1/guests"];
     public const GUEST_DETAIL = ["GET", "/v1/guests/{guestId}"];
     public const CONVERSATIONS = ["GET", "/v1/communication/conversations"];
@@ -130,6 +132,22 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::UPDATE_LISTING_INFO,
+            $data
+        );
+    }
+
+    public function updateListingSetting($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::UPDATE_LISTING_AVAIL_SETTING,
+            $data
+        );
+    }
+
+    public function deleteListing($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::DELETE_LISTING,
             $data
         );
     }
