@@ -27,6 +27,9 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const UPDATE_CONVERSATION = ["PUT", "/v1/owner-inbox/conversations/{conversationId}"];
     public const UPDATE_RESERVATION = ["PUT", "/v1/reservations/{reservationId}"];
     public const ADD_LISTING_SPACE = ["POST", "/v1/properties/spaces/unit-type/{unitTypeId}/add"];
+    public const RETRIEVE_LISTING_SPACE = ["GET","/v1/properties/spaces/unit-type/{unitTypeId}"];
+    public const DELETE_LISTING_SPACE = ["POST","/v1/properties/spaces/space/{spaceId}/remove"];
+    public const EDIT_LISTING_SPACE = ["POST","/v1/properties/spaces/space/{spaceId}/edit"];
 
     protected $token;
     private $clientSecret;
@@ -152,6 +155,31 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             $data
         );
     }
+
+    public function retrieveListingSpace($unitTypeId)
+    {
+        return $this->optimisticRequestWithToken(
+            self::RETRIEVE_LISTING_SPACE,
+            compact("unitTypeId")
+        );
+    }
+
+    public function deleteListingSpace($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::DELETE_LISTING_SPACE,
+            $data
+        );
+    }
+
+    public function editListingSpace($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::EDIT_LISTING_SPACE,
+            $data
+        );
+    }
+
 
     public function deleteListing($data)
     {
