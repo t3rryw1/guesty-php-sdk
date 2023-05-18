@@ -30,6 +30,8 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const RETRIEVE_LISTING_SPACE = ["GET","/v1/properties/spaces/unit-type/{unitTypeId}"];
     public const DELETE_LISTING_SPACE = ["POST","/v1/properties/spaces/space/{spaceId}/remove"];
     public const EDIT_LISTING_SPACE = ["POST","/v1/properties/spaces/space/{spaceId}/edit"];
+    public const APPROVE_PENDING_RESERVATION = ["POST","/v1/reservations/{reservationId}/approve"];
+    public const DECLINE_PENDING_RESERVATION = ["POST","/v1/reservations/{reservationId}/decline"];
 
     protected $token;
     private $clientSecret;
@@ -403,6 +405,22 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::UPDATE_CONVERSATION,
+            $data
+        );
+    }
+
+    public function approvePendingReservation($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::APPROVE_PENDING_RESERVATION,
+            $data
+        );
+    }
+
+    public function declineReservation($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::DECLINE_PENDING_RESERVATION,
             $data
         );
     }
