@@ -32,6 +32,10 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const EDIT_LISTING_SPACE = ["POST","/v1/properties/spaces/space/{spaceId}/edit"];
     public const APPROVE_PENDING_RESERVATION = ["POST","/v1/reservations/{reservationId}/approve"];
     public const DECLINE_PENDING_RESERVATION = ["POST","/v1/reservations/{reservationId}/decline"];
+    public const LIST_USER = ["GET","/v1/users"];
+    public const GET_USER = ["GET","/v1/users/{id}"];
+    public const UPDATE_USER = ["PUT","/v1/users/{id}"];
+    public const CREATE_USER = ["POST","/v1/users"];
 
     protected $token;
     private $clientSecret;
@@ -421,6 +425,47 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::DECLINE_PENDING_RESERVATION,
+            $data
+        );
+    }
+
+    public function getUser($id)
+    {
+        return $this->optimisticRequestWithToken(
+            self::GET_USER,
+            compact('id')
+        );
+    }
+
+    public function listUser(int $skip, $limit)
+    {
+        if ($skip === 0) {
+            $result = $this->optimisticRequestWithToken(
+                self::LIST_USER,
+                ["limit" => $limit]
+            );
+        } else {
+            $result = $this->optimisticRequestWithToken(
+                self::LIST_USER,
+                ["limit" => $limit, "skip" => $skip]
+            );
+        }
+
+        return $result['results'];
+    }
+
+    public function updateUser($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::UPDATE_USER,
+            $data
+        );
+    }
+    
+    public function createUser($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::CREATE_USER,
             $data
         );
     }
