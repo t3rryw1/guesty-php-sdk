@@ -36,6 +36,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const GET_USER = ["GET","/v1/users/{id}"];
     public const UPDATE_USER = ["PUT","/v1/users/{id}"];
     public const CREATE_USER = ["POST","/v1/users"];
+    public const UPDATE_RESERVATION_CUSTOM_FIELD = ["PUT","/v1/reservations/{id}/custom-fields"];
 
     protected $token;
     private $clientSecret;
@@ -126,6 +127,14 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::UPDATE_RESERVATION,
+            $data
+        );
+    }
+
+    public function updateReservationCustomField($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::UPDATE_RESERVATION_CUSTOM_FIELD,
             $data
         );
     }
