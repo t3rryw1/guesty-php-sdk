@@ -37,6 +37,8 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const UPDATE_USER = ["PUT","/v1/users/{id}"];
     public const CREATE_USER = ["POST","/v1/users"];
     public const UPDATE_RESERVATION_CUSTOM_FIELD = ["PUT","/v1/reservations/{id}/custom-fields"];
+    public const RETRIEVE_HOUSE_RULES = ["GET","/v1/properties/house-rules/unit-type/{listingId}"];
+    public const UPDATE_HOUSE_RULES = ["PUT","/v1/properties/house-rules/unit-type/{listingId}"];
 
     protected $token;
     private $clientSecret;
@@ -475,6 +477,22 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::CREATE_USER,
+            $data
+        );
+    }
+
+    public function getHouseRule($listingId)
+    {
+        return $this->optimisticRequestWithToken(
+            self::RETRIEVE_HOUSE_RULES,
+            compact("listingId")
+        );
+    }
+
+    public function updateHouseRule($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::UPDATE_HOUSE_RULES,
             $data
         );
     }
