@@ -21,6 +21,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const DELETE_LISTING = ["DELETE","/v1/listings/{listingId}"];
     public const GUESTS = ["GET", "/v1/guests"];
     public const GUEST_DETAIL = ["GET", "/v1/guests/{guestId}"];
+    public const UPDATE_GUEST_DETAIL = ["PUT", "/v1/guests-crud/{guestId}"];
     public const CONVERSATIONS = ["GET", "/v1/communication/conversations"];
     public const CONVERSATION_DETAIL = ["GET", "/v1/communication/conversations/{conversationId}/posts"];
     public const NEW_MESSAGE = ["POST", "/v1/communication/conversations/{conversationId}/send-message"];
@@ -362,6 +363,14 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         return $this->optimisticRequestWithToken(
             self::GUEST_DETAIL,
             compact('guestId')
+        );
+    }
+
+    public function updateGuest($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::UPDATE_GUEST_DETAIL,
+            $data
         );
     }
 
