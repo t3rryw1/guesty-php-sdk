@@ -106,7 +106,7 @@ abstract class UpdatableTokenClient implements IUpdatableTokenClient
 
         $responseCode = $this->client->getLastResponseCode();
         if ($responseCode >= 400) {
-            if ($responseCode === 401) {
+            if ($responseCode === 401 || $responseCode === 403) {
                 return $this->refetchTokenAndRequest($urlArray, $params);
             } else {
                 $this->throwException($responseCode);
