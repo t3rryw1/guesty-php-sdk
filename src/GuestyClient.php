@@ -21,6 +21,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const DELETE_LISTING = ["DELETE","/v1/listings/{listingId}"];
     public const GUESTS = ["GET", "/v1/guests"];
     public const GUEST_DETAIL = ["GET", "/v1/guests/{guestId}"];
+    public const GET_GUEST_PAYMENT_METHODS = ["GET", "/v1/guests/{guestId}/payment-methods"];
     public const UPDATE_GUEST_DETAIL = ["PUT", "/v1/guests-crud/{guestId}"];
     public const CONVERSATIONS = ["GET", "/v1/communication/conversations"];
     public const CONVERSATION_DETAIL = ["GET", "/v1/communication/conversations/{conversationId}/posts"];
@@ -522,5 +523,13 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         }
 
         return $result['results'];
+    }
+
+    public function getGuestPaymentMethods($guestId)
+    {
+        return $this->optimisticRequestWithToken(
+            self::GET_GUEST_PAYMENT_METHODS,
+            compact('guestId')
+        );
     }
 }
