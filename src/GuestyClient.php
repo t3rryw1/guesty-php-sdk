@@ -526,11 +526,11 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         return $result['results'];
     }
 
-    public function getGuestPaymentMethods($guestId)
+    public function getGuestPaymentMethods($data)
     {
         return $this->optimisticRequestWithToken(
             self::GET_GUEST_PAYMENT_METHODS,
-            compact('guestId')
+            $data
         );
     }
 
