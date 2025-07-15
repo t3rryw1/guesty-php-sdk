@@ -173,4 +173,46 @@ class HttpClient
 
         return $server_output;
     }
+
+    /**
+     * @param $url
+     * @param $headerArray
+     * @param $data
+     * @return bool|string
+     * @throws UnexpectedResponseException
+     */
+    public function patch($url, $headerArray, $data)
+    {
+        if ($this->baseUrl) {
+            $url = trim($this->baseUrl . '/', '/') . "/" . ltrim($url, '/');
+        }
+
+        if (is_array($data)) {
+            $data = http_build_query($data);
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headerArray);
+
+        $server_output = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            throw new UnexpectedResponseException(curl_error($ch));
+        }
+
+        $this->setResponseCode(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
+
+        curl_close($ch);
+
+        if (strcasecmp($server_output, 'ok') == 0) {
+            return true;
+        }
+
+        return $server_output;
+    }
 }
