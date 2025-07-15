@@ -99,6 +99,15 @@ class ClientWrapper
                 }
                 $response = $this->client->delete($template . $query, $header);
                 break;
+            case "patch":
+                if ($requestDryRun) {
+                    return null;
+                }
+                if ($jsonEncode) {
+                    $data = json_encode($data);
+                }
+                $response = $this->client->patch($template, $header, $data);
+                break;
             default:
                 throw new MethodNotAllowedException("invalid request type");
         }

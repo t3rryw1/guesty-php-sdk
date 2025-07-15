@@ -42,6 +42,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const UPDATE_HOUSE_RULES = ["PUT","/v1/properties/house-rules/unit-type/{listingId}"];
     public const GET_SAVED_REPLIES = ["GET","/v1/saved-replies"];
     public const UPDATE_RESERVATION_PAYMENT = ["PUT","/v1/reservation/{reservationId}/payments/{paymentId}"];
+    public const CANCEL_RESERVATION_PAYMENT = ["PATCH","/v1/reservation/{reservationId}/payments/{paymentId}/cancel"];
 
     protected $token;
     private $clientSecret;
@@ -529,6 +530,14 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     {
         return $this->optimisticRequestWithToken(
             self::UPDATE_RESERVATION_PAYMENT,
+            $data
+        );
+    }
+
+    public function cancelReservationPayment($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::CANCEL_RESERVATION_PAYMENT,
             $data
         );
     }
