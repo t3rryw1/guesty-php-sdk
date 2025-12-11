@@ -24,6 +24,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const UPDATE_GUEST_DETAIL = ["PUT", "/v1/guests-crud/{guestId}"];
     public const CONVERSATIONS = ["GET", "/v1/communication/conversations"];
     public const CONVERSATION_DETAIL = ["GET", "/v1/communication/conversations/{conversationId}/posts"];
+    public const CONVERSATION_DETAIL_WITHOUT_MESSAGE = ["GET", "/v1/communication/conversations/{conversationId}"];
     public const NEW_MESSAGE = ["POST", "/v1/communication/conversations/{conversationId}/send-message"];
     public const UPDATE_CONVERSATION = ["PUT", "/v1/owner-inbox/conversations/{conversationId}"];
     public const UPDATE_RESERVATION = ["PUT", "/v1/reservations/{reservationId}"];
@@ -539,6 +540,18 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         return $this->optimisticRequestWithToken(
             self::CANCEL_RESERVATION_PAYMENT,
             $data
+        );
+    }
+
+    /**
+     * @param $conversationId
+     * @return array|mixed|null
+     */
+    public function getConversationDetailWithoutPost($conversationId)
+    {
+        return $this->optimisticRequestWithToken(
+            self::CONVERSATION_DETAIL_WITHOUT_MESSAGE,
+            compact("conversationId")
         );
     }
 }
