@@ -379,17 +379,18 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
 
     /**
      *
-     * @param $cursor : cursor, for fetching data after the cursor
+     * @param $cursorAfter
      * @param $limit : size of returning list
-     * @param $sortParam : the field to sort by
-     * @param $dataParams : the fields to return
+     * @param $sort
+     * @param $fields
+     * @param $filters
      * @return mixed|null
      */
-    public function getConversations($cursorAfter, $limit, $sort, $fields)
+    public function getConversations($cursorAfter, $limit, $sort, $fields, $filters)
     {
         $result = $this->optimisticRequestWithToken(
             self::CONVERSATIONS,
-            array_filter(compact("limit", "sort", "cursorAfter", "fields")),
+            array_filter(compact("limit", "sort", "cursorAfter", "fields","filters")),
             'data'
         );
 
