@@ -44,6 +44,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const GET_SAVED_REPLIES = ["GET","/v1/saved-replies"];
     public const UPDATE_RESERVATION_PAYMENT = ["PUT","/v1/reservations/{reservationId}/payments/{paymentId}"];
     public const CANCEL_RESERVATION_PAYMENT = ["PATCH","/v1/reservations/{reservationId}/payments/{paymentId}/cancel"];
+    public const GET_SAVED_REPLIES_BY_LISTING = ["GET","/v1/saved-replies/listing/{listingId}"];
 
     protected $token;
     private $clientSecret;
@@ -554,5 +555,22 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
             self::CONVERSATION_DETAIL_WITHOUT_MESSAGE,
             compact("conversationId")
         );
+    }
+
+    public function listRepliesByListing($listingId, int $skip, $limit)
+    {
+        if ($skip === 0) {
+            $result = $this->optimisticRequestWithToken(
+                self::GET_SAVED_REPLIES_BY_LISTING,
+                ["listingId" => $listingId, "limit" => $limit]
+            );
+        } else {
+            $result = $this->optimisticRequestWithToken(
+                self::GET_SAVED_REPLIES_BY_LISTING,
+                ["listingId" => $listingId, "limit" => $limit, "skip" => $skip]
+            );
+        }
+
+        return $result['results'];
     }
 }
