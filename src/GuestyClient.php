@@ -45,6 +45,7 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const UPDATE_RESERVATION_PAYMENT = ["PUT","/v1/reservations/{reservationId}/payments/{paymentId}"];
     public const CANCEL_RESERVATION_PAYMENT = ["PATCH","/v1/reservations/{reservationId}/payments/{paymentId}/cancel"];
     public const GET_SAVED_REPLIES_BY_LISTING = ["GET","/v1/saved-replies/listing/{listingId}"];
+    public const GET_ATTACHMENT_URLS = ["GET", "/v1/communication/conversations/get-attachments"];
 
     protected $token;
     private $clientSecret;
@@ -572,5 +573,29 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         }
 
         return $result['results'];
+    }
+
+    /**
+     * Get download URLs for message attachments
+     *
+     * @param array $keys Array of attachment keys
+     * @return array Map of key => download URL
+     */
+    public function getAttachmentUrls(array $keys): array
+    {
+        $response = $this->optimisticRequestWithToken(
+            self::GET_ATTACHMENT_URLS,
+            ['keys' => $keys]
+        );
+
+        // Parse response into key => url map
+        $urls = [];
+        foreach ($response['attachments'] ?? [] as $attachment) {
+            if (isset($attachment['key']) && isset($attachment['url'])) {
+                $urls[$attachment['key']] = $attachment['url'];
+            }
+        }
+
+        return $urls;
     }
 }
