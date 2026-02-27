@@ -46,6 +46,10 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
     public const CANCEL_RESERVATION_PAYMENT = ["PATCH","/v1/reservations/{reservationId}/payments/{paymentId}/cancel"];
     public const GET_SAVED_REPLIES_BY_LISTING = ["GET","/v1/saved-replies/listing/{listingId}"];
     public const GET_ATTACHMENT_URLS = ["GET", "/v1/communication/conversations/get-attachments"];
+    public const UPDATE_RESERVATION_V3_CUSTOM_FIELD = ["PUT","/v1/reservations-v3/{reservationId}/custom-fields"];
+    public const CREATE_RESERVATION_FROM_QUOTE = ["POST","/v1/reservations-v3/quote"];
+    public const QUICK_BOOKING = ["POST","/v1/reservations-v3"];
+    public const CREATE_QUOTE = ["POST","/v1/quotes"];
 
     protected $token;
     private $clientSecret;
@@ -597,5 +601,37 @@ class GuestyClient extends UpdatableTokenClient implements IUpdatableTokenClient
         }
 
         return $urls;
+    }
+
+    public function updateReservationV3CustomField($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::UPDATE_RESERVATION_V3_CUSTOM_FIELD,
+            $data
+        );
+    }
+
+    public function createReservationFromQuote($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::CREATE_RESERVATION_FROM_QUOTE,
+            $data
+        );
+    }
+
+    public function quickBooking($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::QUICK_BOOKING,
+            $data
+        );
+    }
+
+    public function createQuote($data)
+    {
+        return $this->optimisticRequestWithToken(
+            self::CREATE_QUOTE,
+            $data
+        );
     }
 }
